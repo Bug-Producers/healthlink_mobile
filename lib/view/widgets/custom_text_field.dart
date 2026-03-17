@@ -54,12 +54,15 @@ class _CustomTextFieldState extends State<CustomTextField> {
       child: TextField(
         controller: widget.controller,
         obscureText: widget.isPassword == true ? hidden : false,
-        style: TextStyle(color: Colors.white, fontSize: 16.sp),
+        style: TextStyle(color: Color(0XFF475569), fontSize: 16.sp),
         decoration: InputDecoration(
           suffixIcon: suffix(),
           prefixIcon: widget.icon != null
               ? Padding(
-            padding: EdgeInsets.only(left: 12.w),
+            padding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 8.h,
+            ),
             child: widget.icon,
           )
               : null,
@@ -70,18 +73,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
           filled: true,
           fillColor: Colors.white,
           hintText: widget.hintText,
+          hintStyle: TextStyle(color: Color(0XFF94A3B8), fontSize: 16.sp),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
             borderSide: BorderSide(
               color: Color(0xFFe2e8f0),
-              width: 5.w,
+              width: 8.w,
             ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
             borderSide: BorderSide(
               color: Color(0xFFe2e8f0),
-              width: 1.w,
+              width: 3.w,
             ),
           ),
         ),

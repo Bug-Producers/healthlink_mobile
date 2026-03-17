@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthlink_mobile/view/screens/login_screen.dart';
 import 'package:healthlink_mobile/view/widgets/custom_text_field.dart';
 import 'package:healthlink_mobile/view/widgets/descreption_text.dart';
 import 'package:healthlink_mobile/view/widgets/global_button.dart';
@@ -15,18 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(360, 690),
+      designSize: const Size(402, 874),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_ , child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'First Method',
-          home: Scaffold(
-            body: Center(
-              child: CustomTextField(hintText: 'afa')
-              ),
-            ),
+          home: LoginScreen(),
         );
       },
     );

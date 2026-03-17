@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class DescriptionText extends StatelessWidget {
   String text;
@@ -11,6 +12,7 @@ class DescriptionText extends StatelessWidget {
   DescriptionText({
     required this.text,
     this.colorText =const Color(0XFF64748b),
+    this.fontsize,
     super.key
   });
 
@@ -18,7 +20,7 @@ class DescriptionText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: TextStyle(color:colorText,fontSize: fontsize?? 16.sp),
+      style: GoogleFonts.inter(color:colorText,fontSize: fontsize?? 16.sp,fontWeight: FontWeight.normal),
     );
   }
 }
