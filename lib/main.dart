@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:healthlink_mobile/view/widgets/custom_text_field.dart';
+import 'package:healthlink_mobile/view/widgets/descreption_text.dart';
 import 'package:healthlink_mobile/view/widgets/global_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:healthlink_mobile/view/widgets/header_text.dart';
 
 
 void main() {
@@ -21,13 +24,9 @@ class MyApp extends StatelessWidget {
           title: 'First Method',
           home: Scaffold(
             body: Center(
-              child: GlobalButton(text: "text", height: 50.h, width: 350.w,
-                  onPressed: (){
-                    //TODO
-                  }
+              child: CustomTextField(hintText: 'afa')
               ),
             ),
-          ),
         );
       },
     );
