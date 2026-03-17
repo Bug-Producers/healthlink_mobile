@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthlink_mobile/view/screens/login_screen.dart';
-import 'package:healthlink_mobile/view/widgets/custom_text_field.dart';
-import 'package:healthlink_mobile/view/widgets/descreption_text.dart';
-import 'package:healthlink_mobile/view/widgets/global_button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:healthlink_mobile/view/widgets/header_text.dart';
-
-
+import 'package:healthlink_mobile/view/screens/sign_up_screen.dart';
 void main() {
   runApp( MyApp());
 }
@@ -22,7 +17,7 @@ class MyApp extends StatelessWidget {
       builder: (_ , child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: LoginScreen(),
+          home: SignUp(),
         );
       },
     );
