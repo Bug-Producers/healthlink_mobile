@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 class BackWardButton extends StatelessWidget {
-  const BackWardButton({
+   const BackWardButton({
     super.key,
   });
 

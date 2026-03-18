@@ -9,7 +9,7 @@ class ResetPasswordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlobalButton(
-      text: '"Reset Password',
+      text: 'Reset Password',
       height: 56.h,
       width: 376.w,
       onPressed: () {

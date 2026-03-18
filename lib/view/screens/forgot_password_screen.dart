@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:healthlink_mobile/view/screens/pop_up_screen.dart';
 import 'package:healthlink_mobile/view/widgets/custom_text_field.dart';
 import 'package:healthlink_mobile/view/widgets/descreption_text.dart';
 import 'package:healthlink_mobile/view/widgets/global_button.dart';
@@ -20,14 +21,22 @@ class ForgotPasswordScreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
+              //============================
               SizedBox(height: 7.h),
+              //============================
               BackWardButton(),
+              //============================
               SizedBox(height: 30.h),
+              //============================
               ForgotPasswordText(),
+              //============================
               SizedBox(height: 30.h),
+              //============================
               ForgotPasswordDataEntering(),
               SizedBox(height: 10.h),
               ResetPasswordButton(),
+
+
             ],
           ),
         ),

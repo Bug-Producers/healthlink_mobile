@@ -7,8 +7,8 @@ import '../widgets/sign_up/create_account_button.dart';
 import '../widgets/sign_up/create_account_text.dart';
 import '../widgets/sign_up/sign_up_data_entering.dart';
 
-class SignUp extends StatelessWidget {
-  const SignUp({super.key});
+class SignUpScreen extends StatelessWidget {
+  const SignUpScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
