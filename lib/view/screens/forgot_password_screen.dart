@@ -17,21 +17,16 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Column(
             children: [
-              //============================
               SizedBox(height: 7.h),
-              //============================
               BackWardButton(),
-              //============================
               SizedBox(height: 30.h),
-              //============================
               ForgotPasswordText(),
-              //============================
               SizedBox(height: 30.h),
-              //============================
               ForgotPasswordDataEntering(),
               SizedBox(height: 10.h),
               ResetPasswordButton(),
