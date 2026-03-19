@@ -5,6 +5,7 @@ import '../widgets/forgot_password_check_email/forgot_password_check_email_text.
 import '../widgets/forgot_password_check_email/otp_field_area.dart';
 import '../widgets/forgot_password_check_email/resend_email_button.dart';
 import '../widgets/forgot_password_check_email/verify_code_button.dart';
+import '../widgets/medical_specialties_button.dart';
 class ForgetPasswordCheckEmail extends StatelessWidget {
   const ForgetPasswordCheckEmail({super.key});
 
@@ -26,6 +27,8 @@ class ForgetPasswordCheckEmail extends StatelessWidget {
               VerifyCodeButton(),
               SizedBox(height: 40.h),
               ResendEmailButton(),
+              SizedBox(height: 40.h),
+              MedicalSpecialtiesButton(svgPath: 'assets/Icon.svg', name: 'Cardiology', color: Color(0XFFfbe3e3),),
             ],
           ),
         ),
