@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthlink_mobile/previews/sandbox.dart';
 import 'package:healthlink_mobile/view/screens/forget_password_check_email.dart';
 import 'package:healthlink_mobile/view/screens/forgot_password_screen.dart';
 import 'package:healthlink_mobile/view/screens/login_screen.dart';
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       builder: (_ , child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: ForgetPasswordCheckEmail(),
+          home: Sandbox(),
         );
       },
     );
