@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthlink_mobile/view/screens/home_page_screen.dart';
-import 'package:healthlink_mobile/view/widgets/doctor_card.dart';
+import 'package:healthlink_mobile/features/home/view/screens/home_page_screen.dart';
 
-import '../models/doctor.dart';
 
 class Sandbox extends StatelessWidget {
   const Sandbox({super.key});

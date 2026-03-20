@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:healthlink_mobile/previews/sandbox.dart';
-import 'package:healthlink_mobile/view/screens/forget_password_check_email.dart';
-import 'package:healthlink_mobile/view/screens/forgot_password_screen.dart';
-import 'package:healthlink_mobile/view/screens/login_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:healthlink_mobile/view/screens/password_reset_successfully_screen.dart';
-import 'package:healthlink_mobile/view/screens/pop_up_screen.dart';
-import 'package:healthlink_mobile/view/screens/set_a_new_password_screen.dart';
-import 'package:healthlink_mobile/view/screens/sign_up_screen.dart';
+
 void main() {
   runApp( MyApp());
 }
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
