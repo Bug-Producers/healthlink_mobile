@@ -35,7 +35,7 @@ class GlobalButton extends StatelessWidget {
             borderRadius: BorderRadiusGeometry.circular(cornerRadius ?? 10.r),
           ),
         ),
-        onPressed: () {},
+        onPressed: onPressed,
         child: Text(
           text,
           style: TextStyle(color: colorText, fontSize: fontSize ?? 16.sp),
