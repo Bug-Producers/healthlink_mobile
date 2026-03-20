@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MedicalSpecialtiesButton extends StatelessWidget {
   final String svgPath;
@@ -39,7 +40,7 @@ class MedicalSpecialtiesButton extends StatelessWidget {
             ),
             SizedBox(height:15.h),
              Text(name,
-               style: TextStyle(color: Colors.black,fontSize: 14.sp),
+               style: GoogleFonts.inter(color: Colors.black,fontSize: 14.sp),
              ),
           ],
         ),

@@ -28,7 +28,7 @@ class ForgetPasswordCheckEmail extends StatelessWidget {
               SizedBox(height: 40.h),
               ResendEmailButton(),
               SizedBox(height: 40.h),
-              MedicalSpecialtiesButton(svgPath: 'assets/Icon.svg', name: 'Cardiology', color: Color(0XFFfbe3e3),),
+
             ],
           ),
         ),
