@@ -15,6 +15,7 @@ class HomePageScreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
+              SizedBox(height: 10.h),
               SizedBox(
                 width: 333.w,
                 height: 52.h,
@@ -39,21 +40,27 @@ class HomePageScreen extends StatelessWidget {
                       fontsize: 19.sp,
                       fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(width: 140.w),
-                    Container(
-                      height: 38.h,
-                      width: 38.w,
-                      decoration: BoxDecoration(
-                        color: Color(0XFFe8effe),
-                        borderRadius: BorderRadius.circular(8.r),
-                      ),
-                      child: Center(
-                        child: SizedBox(
-                          height: 26.h,
-                          width: 26.h,
-                          child: SvgPicture.asset(
-                            "assets/Calendar.svg",
-                            fit: BoxFit.contain,
+                    Spacer(),
+                    InkWell(
+                      onTap: () {},
+                      borderRadius: BorderRadius.circular(8.r),
+                      splashColor: Color(0XFF135bec).withOpacity(0.1),
+                      highlightColor: Color(0XFF135bec).withOpacity(0.05),
+                      child: Ink(
+                        height: 38.h,
+                        width: 38.w,
+                        decoration: BoxDecoration(
+                          color: Color(0XFFe8effe),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            height: 25.h,
+                            width: 25.h,
+                            child: SvgPicture.asset(
+                              "assets/Calendar.svg",
+                              fit: BoxFit.fill,
+                            ),
                           ),
                         ),
                       ),
@@ -75,23 +82,20 @@ class HomePageScreen extends StatelessWidget {
                 child: DescriptionText(text: "Book an appointment in minutes"),
               ),
               SizedBox(height: 10.h),
-              GestureDetector(
+              InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(12.r),
                 child: Container(
                   width: 333.w,
                   height: 52.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
-                    border: BoxBorder.all(width: 2.w, color: Color(0XFFe2e8f0)),
+                    border: Border.all(width: 2.w, color: Color(0XFFe2e8f0)),
                   ),
                   child: Row(
                     children: [
                       SizedBox(width: 15.w),
-                      Icon(
-                        Icons.search,
-                        color: Color(0XFF94a3b8),
-                        size: 25.r,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      Icon(Icons.search, color: Color(0XFF94a3b8), size: 25.r),
                       SizedBox(width: 8.w),
                       DescriptionText(
                         text: "Search by doctor or specialty",
@@ -111,21 +115,53 @@ class HomePageScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: 15.h),
               SizedBox(
-                height: 500.h,
-                width: double.infinity,
+                width: 333.w,
+                height: 510.h,
                 child: GridView.count(
                   crossAxisCount: 2,
-                  children:  [
-                    MedicalSpecialtiesButton(svgPath: 'assets/Cardiology.svg', name: 'Cardiology', color: Color(0XFFFBE3E3),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/Pediatrics.svg', name: 'Pediatrics', color: Color(0XFFD9E8FB),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/DentalIcon.svg', name: 'Dental', color: Color(0XFFD3F7EF),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/General.svg', name: 'General', color: Color(0XFFEDDEFB),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/Neurologysvg.svg', name: 'Neurology', color: Color(0xFFFCEFDF),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/EYE.svg', name: 'Ophthalmology', color: Color(0xFFD4F9DF),),
-                    MedicalSpecialtiesButton(svgPath: 'assets/FemaleIcon.svg', name: 'Gynecology', color: Color(0XFFfbe3f0)),
-                    MedicalSpecialtiesButton(svgPath: 'assets/Orthopedics.svg', name: 'Orthopedics', color: Color(0XFFfbf8d4)),
-
+                  children: [
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/Cardiology.svg',
+                      name: 'Cardiology',
+                      color: Color(0XFFFBE3E3),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/Pediatrics.svg',
+                      name: 'Pediatrics',
+                      color: Color(0XFFD9E8FB),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/DentalIcon.svg',
+                      name: 'Dental',
+                      color: Color(0XFFD3F7EF),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/General.svg',
+                      name: 'General',
+                      color: Color(0XFFEDDEFB),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/Neurologysvg.svg',
+                      name: 'Neurology',
+                      color: Color(0xFFFCEFDF),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/EYE.svg',
+                      name: 'Ophthalmology',
+                      color: Color(0xFFD4F9DF),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/FemaleIcon.svg',
+                      name: 'Gynecology',
+                      color: Color(0XFFfbe3f0),
+                    ),
+                    MedicalSpecialtiesButton(
+                      svgPath: 'assets/Orthopedics.svg',
+                      name: 'Orthopedics',
+                      color: Color(0XFFfbf8d4),
+                    ),
                   ],
                 ),
               ),

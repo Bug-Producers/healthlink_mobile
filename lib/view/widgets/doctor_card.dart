@@ -45,7 +45,7 @@ class ButtonAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding:  EdgeInsets.all(4.r),
-      child: GestureDetector(
+      child: InkWell(
         onTap: onTap,
         child: Container(
           height: 40.h,
