@@ -19,7 +19,10 @@ class ForgotPasswordScreen extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 7.h),
-              BackWardButton(),
+              Padding(
+                padding:  EdgeInsets.fromLTRB(0,0,310.h,0),
+                child: BackWardButton(),
+              ),
               SizedBox(height: 30.h),
               ForgotPasswordText(),
               SizedBox(height: 30.h),

@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Doctor {
   final String uuid;
   final String name;
@@ -39,5 +41,9 @@ class Doctor {
       about: json['about'] ?? '',
       profileImage: json['profileImage'] ?? '',
     );
-  }
 }
+
+  String patientsFormatted() {
+    final f = NumberFormat.decimalPattern();
+    return f.format(patients);
+  }}

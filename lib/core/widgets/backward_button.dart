@@ -8,7 +8,7 @@ class BackWardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, 0, 310.w, 0),
+      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
       child: Container(
         height: 40.h,
         width: 54.w,

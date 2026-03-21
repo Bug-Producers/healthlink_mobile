@@ -6,20 +6,25 @@ class DescriptionText extends StatelessWidget {
   final String text;
   final Color colorText;
   final double? fontsize;
-
+  final FontWeight? fontWeight;
 
   const DescriptionText({
     required this.text,
-    this.colorText =const Color(0XFF64748b),
+    this.colorText = const Color(0XFF64748b),
     this.fontsize,
-    super.key
+    this.fontWeight,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: GoogleFonts.inter(color:colorText,fontSize: fontsize?? 16.sp,fontWeight: FontWeight.normal),
+      style: GoogleFonts.inter(
+        color: colorText,
+        fontSize: fontsize ?? 16.sp,
+        fontWeight: fontWeight ?? FontWeight.normal,
+      ),
     );
   }
 }

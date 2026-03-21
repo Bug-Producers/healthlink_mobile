@@ -17,7 +17,10 @@ class ForgetPasswordCheckEmail extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: 7.h),
-              BackWardButton(),
+              Padding(
+                padding:  EdgeInsets.fromLTRB(0,0,310.h,0),
+                child: BackWardButton(),
+              ),
               SizedBox(height: 40.h),
               ForgotPasswordCheckEmailText(),
               SizedBox(height: 42.h),
