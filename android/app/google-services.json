@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "780566146913",
+    "project_id": "bugs-producers",
+    "storage_bucket": "bugs-producers.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:780566146913:android:de1fb8ec43c400cf569f20",
+        "android_client_info": {
+          "package_name": "com.example.healthlink_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUZRWHboGdg3-33znnsmEjUcXhfkXbAOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
