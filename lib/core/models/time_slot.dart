@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class TimeSlot {
   TimeOfDay start;
   TimeOfDay end;

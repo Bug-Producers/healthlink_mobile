@@ -11,6 +11,7 @@ class DaySchedule {
     required this.day,
     required this.number,
     required this.slots,
+
   });
 
   factory DaySchedule.fromJson(Map<String, dynamic> json) {

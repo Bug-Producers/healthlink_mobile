@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthlink_mobile/previews/sandbox.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'features/booking/view/screens/booking_successful_screen.dart';
 
 void main() {
   runApp( MyApp());
@@ -16,7 +17,7 @@ class MyApp extends StatelessWidget {
       builder: (_ , child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: Sandbox(),
+          home: BookingSuccessfulScreen(),
         );
       },
     );
