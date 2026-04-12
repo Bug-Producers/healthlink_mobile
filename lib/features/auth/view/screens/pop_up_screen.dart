@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:healthlink_mobile/core/widgets/descreption_text.dart';
 import 'package:healthlink_mobile/core/widgets/global_button.dart';
-
+import '../../../../core/router/app_router.dart';
 import '../../../../core/widgets/header_text.dart';
 
 class PopUpScreen extends StatelessWidget {
@@ -15,8 +16,8 @@ class PopUpScreen extends StatelessWidget {
       width: 392.64.w,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadiusGeometry.circular(29.36.r),
-        border: Border.all(color: Color(0XFFBEBEBE), width: 1.w),
+        borderRadius: BorderRadius.circular(29.36.r),
+        border: Border.all(color: const Color(0XFFBEBEBE), width: 1.w),
       ),
       child: Center(
         child: Column(
@@ -24,17 +25,16 @@ class PopUpScreen extends StatelessWidget {
             SizedBox(height: 16.h),
             HeaderText(text: "Successful", fontsize: 18.sp),
             SizedBox(height: 22.h),
-            DescriptionText(text: "Congratulations! Your password has"),
-            DescriptionText(text: "been changed. Click continue to login"),
+            const DescriptionText(text: "Congratulations! Your password has"),
+            const DescriptionText(text: "been changed. Click continue to login"),
             SizedBox(height: 25.h),
             GlobalButton(
               text: "Continue",
               height: 51.37.h,
               width: 344.94.w,
               fontSize: 18.sp,
-
-              onPressed: (){
-                //TODO
+              onPressed: () {
+                context.go(AppRouter.login);
               },
             ),
           ],

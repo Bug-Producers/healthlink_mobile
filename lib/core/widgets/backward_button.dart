@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 class BackWardButton extends StatelessWidget {
-   const BackWardButton({
+  const BackWardButton({
     super.key,
   });
 
@@ -17,15 +18,12 @@ class BackWardButton extends StatelessWidget {
         ),
         child: IconButton(
           onPressed: () {
-            //TODO
+            Navigator.pop(context);
           },
           icon: Icon(
             Icons.arrow_back_outlined,
             color: Colors.black,
             size: 30,
-          ),
-          style: IconButton.styleFrom(
-            backgroundColor: Color(0XFFeef4fc),
           ),
         ),
       ),

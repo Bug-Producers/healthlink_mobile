@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:healthlink_mobile/features/auth/view/screens/login_screen.dart';
 import '../core/models/day.dart';
 import '../core/models/day_schedule.dart';
 import '../core/models/doctor.dart';
@@ -96,7 +97,4 @@ class Sandbox extends StatelessWidget {
       profileImage: "https://sis.ecu.edu.eg/Files/UserImages/192400676_20240910142333.jpg",
     );
 
-    return DoctorBookingScreen(
-      doctor: doctor,
-      schedule: mockSchedule,
-    );  }  }
+    return LoginScreen();  }  }

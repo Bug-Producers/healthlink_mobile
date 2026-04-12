@@ -9,13 +9,15 @@ class GlobalButton extends StatelessWidget {
   final double? cornerRadius;
   final double width;
   final double height;
+  final bool isLoading;
   final VoidCallback onPressed;
 
   const GlobalButton({
     required this.text,
     required this.height,
     required this.width,
-    required this .onPressed,
+    required this.onPressed,
+    this.isLoading = false,
     this.colorButton = const Color(0XFF135bec),
     this.colorText = Colors.white,
     this.cornerRadius,
@@ -32,11 +34,20 @@ class GlobalButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: colorButton,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadiusGeometry.circular(cornerRadius ?? 10.r),
+            borderRadius: BorderRadius.circular(cornerRadius ?? 10.r),
           ),
         ),
-        onPressed: onPressed,
-        child: Text(
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? SizedBox(
+          height: 20.h,
+          width: 20.h,
+          child: CircularProgressIndicator(
+            color: colorText,
+            strokeWidth: 2,
+          ),
+        )
+            : Text(
           text,
           style: TextStyle(color: colorText, fontSize: fontSize ?? 16.sp),
         ),

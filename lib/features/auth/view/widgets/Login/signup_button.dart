@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../../core/router/app_router.dart';
 import '../../../../../core/widgets/descreption_text.dart';
 
 class SignUp extends StatelessWidget {
@@ -16,7 +18,8 @@ class SignUp extends StatelessWidget {
 
         DescriptionText(text: "Don't have an account?",fontsize: 14.sp),
         TextButton(
-          onPressed: () {},
+          onPressed: () {context.push(AppRouter.signUp);
+          },
           style: TextButton.styleFrom(
             padding: EdgeInsets.fromLTRB(5.w,0,0,0),
             minimumSize: Size(0, 0),

@@ -25,7 +25,7 @@ class HomePageScreen extends StatelessWidget {
               HomePageText(),
               SizedBox(height: 10.h),
               SearchButtonInHomePage(),
-              SizedBox(height: 38.h),
+              SizedBox(height: 24.h),
               SizedBox(
                 width: 333.w,
                 child: HeaderText(
@@ -34,7 +34,7 @@ class HomePageScreen extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 15.h),
+              SizedBox(height: 12.h),
               MedicalSpecialtiesGridButtons(),
             ],
           ),
