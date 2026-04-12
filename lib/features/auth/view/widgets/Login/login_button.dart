@@ -28,7 +28,7 @@ class LoginButton extends ConsumerWidget {
       onPressed: () {
         FocusScope.of(context).unfocus();
         final email = emailController.text.trim();
-        final password = passwordController.text.trim();
+        final password = passwordController.text;
 
         final emailError = AppValidator.validateEmail(email);
         if (emailError != null) {
@@ -36,9 +36,8 @@ class LoginButton extends ConsumerWidget {
           return;
         }
 
-        final passwordError = AppValidator.validatePassword(password);
-        if (passwordError != null) {
-          CustomSnackBar.showError(context, message: passwordError);
+        if (password.isEmpty) {
+          CustomSnackBar.showError(context, message: 'Password is required');
           return;
         }
 

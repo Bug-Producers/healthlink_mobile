@@ -30,7 +30,9 @@ class CreateAccountButton extends ConsumerWidget {
         data: (user) {
           if (user != null && prev?.isLoading == true) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Verification email sent. Please check your inbox.')),
+              const SnackBar(
+                content: Text('Verification email sent. Please check your inbox.'),
+              ),
             );
           }
         },
@@ -80,7 +82,7 @@ class CreateAccountButton extends ConsumerWidget {
 
         await ref.read(authViewModelProvider.notifier).register(
           emailController.text.trim(),
-          passwordController.text.trim(),
+          passwordController.text,
           nameController.text.trim(),
         );
       },

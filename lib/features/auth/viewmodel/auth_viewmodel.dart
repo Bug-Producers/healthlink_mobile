@@ -9,7 +9,12 @@ class AuthViewModel extends AsyncNotifier<User?> {
   @override
   Future<User?> build() async {
     _repo = ref.read(authRepositoryProvider);
-    return _repo.currentUser;
+    final user = _repo.currentUser;
+    if (user != null) {
+      await user.reload();
+      return _repo.currentUser;
+    }
+    return null;
   }
 
   Future<void> login(String email, String password) async {
@@ -36,8 +41,19 @@ class AuthViewModel extends AsyncNotifier<User?> {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final result = await _repo.signInWithGoogle();
-      return result?.user;
+      if (result == null) return null;
+      return result.user;
     });
+  }
+
+  Future<void> reloadUser() async {
+    await _repo.reloadUser();
+    final user = _repo.currentUser;
+    state = AsyncData(user);
+  }
+
+  Future<void> resendVerificationEmail() async {
+    await _repo.resendVerificationEmail();
   }
 
   Future<void> forgetPassword(String email) async {
