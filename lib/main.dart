@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:healthlink_mobile/previews/sandbox.dart';
 import 'core/router/app_router.dart';
+import 'features/auth/view/screens/search_by_category_screen.dart';
+import 'features/auth/view/screens/search_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -16,6 +19,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({super.key});
 
   @override
@@ -24,12 +28,16 @@ class MyApp extends StatelessWidget {
       designSize: const Size(402, 874),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, child) {
-        return MaterialApp.router(
-          debugShowCheckedModeBanner: false,
-          routerConfig: AppRouter.router,
-        );
-      },
+        builder: (context, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: Sandbox(),
+          );
+        },
+         // MaterialApp.router(
+        //  debugShowCheckedModeBanner: false,
+         // routerConfig: AppRouter.router,
+       // );
     );
   }
 }
