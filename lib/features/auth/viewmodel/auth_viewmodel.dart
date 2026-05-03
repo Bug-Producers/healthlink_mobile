@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../providers/auth_repository_provider.dart';
+import '../../../../core/utils/app_logger.dart';
 
 class AuthViewModel extends AsyncNotifier<User?> {
   late final AuthRepository _repo;
@@ -18,31 +19,55 @@ class AuthViewModel extends AsyncNotifier<User?> {
   }
 
   Future<void> login(String email, String password) async {
+    AppLogger.info('Attempting login for email: $email', 'AuthViewModel');
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final result = await _repo.login(email: email, password: password);
-      return result.user;
+      try {
+        final result = await _repo.login(email: email, password: password);
+        AppLogger.info('Login successful', 'AuthViewModel');
+        return result.user;
+      } catch (e, st) {
+        AppLogger.error('Login failed', error: e, stackTrace: st, name: 'AuthViewModel');
+        rethrow;
+      }
     });
   }
 
   Future<void> register(String email, String password, String username) async {
+    AppLogger.info('Attempting registration for email: $email', 'AuthViewModel');
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final result = await _repo.register(
-        email: email,
-        password: password,
-        username: username,
-      );
-      return result.user;
+      try {
+        final result = await _repo.register(
+          email: email,
+          password: password,
+          username: username,
+        );
+        AppLogger.info('Registration successful', 'AuthViewModel');
+        return result.user;
+      } catch (e, st) {
+        AppLogger.error('Registration failed', error: e, stackTrace: st, name: 'AuthViewModel');
+        rethrow;
+      }
     });
   }
 
   Future<void> signInWithGoogle() async {
+    AppLogger.info('Attempting Google Sign-In', 'AuthViewModel');
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final result = await _repo.signInWithGoogle();
-      if (result == null) return null;
-      return result.user;
+      try {
+        final result = await _repo.signInWithGoogle();
+        if (result == null) {
+          AppLogger.info('Google Sign-In cancelled by user', 'AuthViewModel');
+          return null;
+        }
+        AppLogger.info('Google Sign-In successful', 'AuthViewModel');
+        return result.user;
+      } catch (e, st) {
+        AppLogger.error('Google Sign-In failed', error: e, stackTrace: st, name: 'AuthViewModel');
+        rethrow;
+      }
     });
   }
 
@@ -61,6 +86,7 @@ class AuthViewModel extends AsyncNotifier<User?> {
   }
 
   Future<void> logout() async {
+    AppLogger.info('Logging out user', 'AuthViewModel');
     await _repo.logout();
     state = const AsyncData(null);
   }

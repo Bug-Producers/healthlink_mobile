@@ -29,15 +29,17 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
         builder: (context, child) {
-          return MaterialApp(
+
+          return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            home: Sandbox(),
-          );
+           routerConfig: AppRouter.router,
+           );
+            //MaterialApp(
+            //debugShowCheckedModeBanner: false,
+           // home: Sandbox(),
+         // );
         },
-         // MaterialApp.router(
-        //  debugShowCheckedModeBanner: false,
-         // routerConfig: AppRouter.router,
-       // );
+
     );
   }
 }

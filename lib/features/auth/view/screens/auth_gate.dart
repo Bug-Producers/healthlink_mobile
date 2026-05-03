@@ -4,6 +4,7 @@ import '../../../home/view/screens/home_page_screen.dart';
 import '../../providers/auth_viewmodel_provider.dart';
 import 'email_verification_screen.dart';
 import 'login_screen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
@@ -20,12 +21,26 @@ class AuthGate extends ConsumerWidget {
         }
         return const HomePageScreen();
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      loading: () => Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              SizedBox(height: 16.h),
+              Text(
+                'Verifying authentication...',
+                style: TextStyle(
+                  fontSize: 16.sp,
+                  color: Colors.grey[700],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      error: (error, stackTrace) => Scaffold(
-        body: Center(child: Text('An error occurred: $error')),
-      ),
+      // Instead of an error page, return to LoginScreen. The LoginScreen's listener will show the SnackBar.
+      error: (error, stackTrace) => const LoginScreen(),
     );
   }
 }
