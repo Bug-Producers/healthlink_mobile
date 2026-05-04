@@ -4,6 +4,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/widgets/header_text.dart';
 import '../../screens/doctor_booking_screen.dart';
+
+/**
+ * Displays the doctor's profile image, name, department, and location.
+ */
 class DoctorDetails extends StatelessWidget {
   const DoctorDetails({
     super.key,

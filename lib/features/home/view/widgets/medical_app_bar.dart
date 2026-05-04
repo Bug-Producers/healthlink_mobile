@@ -7,7 +7,7 @@ import '../../../auth/providers/auth_viewmodel_provider.dart';
 import '../../../../features/booking/view/screens/my_appointments_screen.dart';
 
 /**
- * @brief App bar for the medical home screen.
+ * App bar for the medical home screen.
  * 
  * Contains branding, a button to view appointments, and a logout button.
  */

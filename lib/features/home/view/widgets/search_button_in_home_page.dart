@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/widgets/descreption_text.dart';
+import '../../../../features/booking/view/screens/search_by_category_screen.dart';
+
+/**
+ * A search bar button on the home screen that triggers doctor discovery.
+ */
 class SearchButtonInHomePage extends StatelessWidget {
   const SearchButtonInHomePage({
     super.key,
@@ -9,7 +14,14 @@ class SearchButtonInHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SearchByCategoryScreen(departmentName: ""),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
         width: 333.w,
@@ -34,5 +46,3 @@ class SearchButtonInHomePage extends StatelessWidget {
     );
   }
 }
-
-

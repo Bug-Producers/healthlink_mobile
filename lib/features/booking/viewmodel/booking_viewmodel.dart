@@ -3,7 +3,7 @@ import '../repositories/patient_repository.dart';
 import '../providers/patient_repository_provider.dart';
 
 /**
- * @brief ViewModel for managing the state of booking an appointment.
+ * ViewModel for managing the state of booking an appointment.
  */
 class BookingViewModel extends AsyncNotifier<void> {
   late final PatientRepository _repo;
@@ -15,7 +15,7 @@ class BookingViewModel extends AsyncNotifier<void> {
   }
 
   /**
-   * @brief Books an appointment, handling the loading and error states.
+   * Books an appointment, handling the loading and error states.
    * 
    * @param doctorId The ID of the doctor.
    * @param date The chosen date.

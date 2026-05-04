@@ -7,7 +7,7 @@ import '../widgets/medical_specialties_grid_buttons.dart';
 import '../widgets/search_button_in_home_page.dart';
 
 /**
- * @brief The main home screen for patients.
+ * The main home screen for patients.
  * 
  * Allows the patient to view medical specialties, search for doctors,
  * and navigate to their profile/appointments.

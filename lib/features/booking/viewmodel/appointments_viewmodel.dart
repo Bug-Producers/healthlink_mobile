@@ -5,7 +5,7 @@ import '../providers/patient_repository_provider.dart';
 import '../../../../core/utils/app_logger.dart'; // Assuming this exists or falls back to print
 
 /**
- * @brief ViewModel for managing the state of a patient's appointments.
+ * ViewModel for managing the state of a patient's appointments.
  */
 class AppointmentsViewModel extends AsyncNotifier<List<Appointment>> {
   late final PatientRepository _repo;
@@ -27,7 +27,7 @@ class AppointmentsViewModel extends AsyncNotifier<List<Appointment>> {
   }
 
   /**
-   * @brief Refreshes the list of appointments.
+   * Refreshes the list of appointments.
    */
   Future<void> refresh() async {
     state = const AsyncLoading();
@@ -35,9 +35,8 @@ class AppointmentsViewModel extends AsyncNotifier<List<Appointment>> {
   }
 
   /**
-   * @brief Cancels an appointment and removes it from the list.
-   * 
-   * @param id The ID of the appointment to cancel.
+   * Cancels an appointment and removes it from the list.
+   * id The ID of the appointment to cancel.
    */
   Future<void> cancelAppointment(String id) async {
     // We don't want to set the whole screen to loading, just perform the action

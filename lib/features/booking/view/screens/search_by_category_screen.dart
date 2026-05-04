@@ -5,8 +5,8 @@ import '../../../../core/models/doctor.dart';
 import '../../../../core/widgets/backward_button.dart';
 import '../../../../core/widgets/doctor_card.dart';
 import '../../../../core/widgets/header_text.dart';
-import '../../../booking/providers/patient_repository_provider.dart';
-import '../../../booking/view/screens/doctor_booking_screen.dart';
+import '../../providers/patient_repository_provider.dart';
+import 'doctor_booking_screen.dart';
 
 /**
  * Displays a list of doctors filtered by the selected department.
@@ -29,21 +29,21 @@ class SearchByCategoryScreen extends ConsumerWidget {
         leading: const BackWardButton(),
         centerTitle: true,
         title: HeaderText(
-          text: departmentName,
+          text: departmentName.isEmpty ? "Find Care" : departmentName,
           fontsize: 18.sp,
           fontWeight: FontWeight.bold,
         ),
       ),
       body: SafeArea(
         child: FutureBuilder<List<Doctor>>(
-          future: repo.getDoctorsByDepartment(departmentName),
+          future: departmentName.isEmpty ? repo.getAllDoctors() : repo.getDoctorsByDepartment(departmentName),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text("Error fetching doctors: ${snapshot.error}"));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text("No doctors found for $departmentName."));
+              return Center(child: Text("No doctors found."));
             }
 
             final doctors = snapshot.data!;
@@ -56,7 +56,35 @@ class SearchByCategoryScreen extends ConsumerWidget {
                   SizedBox(height: 8.h),
                   Divider(height: 1.h, color: const Color(0XFFe2e8f0)),
                   SizedBox(height: 16.h),
+
+                  // Search Bar
+                  Container(
+                    width: double.infinity,
+                    height: 55.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        width: 2.w,
+                        color: const Color(0XFFf8fafc),
+                      ),
+                    ),
+                    child: TextField(
+                      onChanged: (val) {
+                        // Filtering logic can go here
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search doctors, clinics, or specialty",
+                        hintStyle: TextStyle(color: const Color(0XFF64748b), fontSize: 14.sp),
+                        prefixIcon: Icon(Icons.search, color: const Color(0XFF64748b), size: 25.r),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 15.h),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 32.h),
                   HeaderText(text: "Suggested Doctors", fontsize: 18.sp),
+                  SizedBox(height: 16.h),
                   Expanded(
                     child: ListView.builder(
                       padding: EdgeInsets.only(bottom: 24.h),
@@ -73,7 +101,7 @@ class SearchByCategoryScreen extends ConsumerWidget {
                                 MaterialPageRoute(
                                   builder: (context) => DoctorBookingScreen(
                                     doctor: doctor,
-                                    schedule: const [], 
+                                    schedule: const [], // TODO: Fetch real schedule or pass from doctor model if available
                                   ),
                                 ),
                               );

@@ -1,9 +1,11 @@
 /**
- * @brief Represents a patient's appointment.
+ * Represents a patient's appointment.
  */
 class Appointment {
   final String id;
   final String doctorId;
+  final String? doctorName;
+  final String? doctorImage;
   final String date;
   final String startTime;
   final String endTime;
@@ -11,17 +13,21 @@ class Appointment {
   final int status;
 
   /**
-   * @param id Unique identifier of the appointment.
-   * @param doctorId The doctor's ID.
-   * @param date Date of the appointment.
-   * @param startTime Start time (HH:MM).
-   * @param endTime End time (HH:MM).
-   * @param duration Duration in minutes.
-   * @param status Status of the appointment (0=Booked, 1=Completed, 2=Cancelled).
+   * id Unique identifier of the appointment.
+   * doctorId The doctor's ID.
+   * doctorName The doctor's full name.
+   * doctorImage The doctor's profile image URL.
+   * date Date of the appointment.
+   * startTime Start time (HH:MM).
+   * endTime End time (HH:MM).
+   * duration Duration in minutes.
+   * status Status of the appointment (0=Booked, 1=Completed, 2=Cancelled).
    */
   Appointment({
     required this.id,
     required this.doctorId,
+    this.doctorName,
+    this.doctorImage,
     required this.date,
     required this.startTime,
     required this.endTime,
@@ -30,12 +36,14 @@ class Appointment {
   });
 
   /**
-   * @brief Factory constructor to create an Appointment from JSON.
+   * Factory constructor to create an Appointment from JSON.
    */
   factory Appointment.fromJson(Map<String, dynamic> json) {
     return Appointment(
       id: json['id'] as String? ?? '',
       doctorId: json['doctorId'] as String? ?? '',
+      doctorName: json['doctorName'] as String?,
+      doctorImage: json['doctorImage'] as String?,
       date: json['date'] as String? ?? '',
       startTime: json['startTime'] as String? ?? '',
       endTime: json['endTime'] as String? ?? '',

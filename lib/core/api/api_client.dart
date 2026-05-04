@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /**
- * @brief Singleton ApiClient that configures Dio with Firebase Auth tokens.
+ * Singleton ApiClient that configures Dio with Firebase Auth tokens.
  *
  * This client provides the foundational HTTP methods (GET, POST, DELETE, etc.)
  * for the application, automatically appending the Bearer token for secure routes.
@@ -12,8 +12,7 @@ class ApiClient {
   late final Dio dio;
 
   /**
-   * @brief Factory constructor to return the singleton instance.
-   * @return ApiClient instance.
+   * Factory constructor to return the singleton instance.
    */
   factory ApiClient() {
     return _instance;
@@ -22,10 +21,9 @@ class ApiClient {
   ApiClient._internal() {
     dio = Dio(
       BaseOptions(
-        // Use 10.0.2.2 for Android Emulator, or localhost for iOS/Desktop
-        baseUrl: 'http://10.0.2.2:8080/api',
-        connectTimeout: const Duration(seconds: 10),
-        receiveTimeout: const Duration(seconds: 10),
+        baseUrl: 'https://healthlink-api.loca.lt/api',
+        connectTimeout: const Duration(seconds: 15),
+        receiveTimeout: const Duration(seconds: 15),
       ),
     );
 

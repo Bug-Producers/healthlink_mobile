@@ -1,25 +1,17 @@
 import 'package:dio/dio.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/models/appointment.dart';
+import '../../../../core/models/doctor.dart';
 
 /**
- * @brief Repository for interacting with the backend Patient API.
- * 
- * Handles all patient-facing endpoints such as fetching doctors,
- * booking appointments, and cancelling appointments.
+ * Repository for interacting with the backend Patient API.
+ * Handles fetching doctors, booking, and cancelling appointments.
  */
 class PatientRepository {
   final ApiClient _apiClient = ApiClient();
 
   /**
-   * @brief Books an appointment for the current patient.
-   * 
-   * @param doctorId The unique identifier of the doctor.
-   * @param date The date of the appointment (e.g., "2025-04-20").
-   * @param dayOfWeek The day of the week (e.g., "monday").
-   * @param frameStart The start time of the slot (e.g., "09:00").
-   * @param frameEnd The end time of the slot (e.g., "14:00").
-   * @return A map containing the booked appointment details.
+   * Books an appointment for the current patient.
    */
   Future<Map<String, dynamic>> bookAppointment({
     required String doctorId,
@@ -46,9 +38,7 @@ class PatientRepository {
   }
 
   /**
-   * @brief Fetches all appointments for the current patient.
-   * 
-   * @return A list of Appointment objects.
+   * Fetches all appointments for the current patient.
    */
   Future<List<Appointment>> getAppointments() async {
     try {
@@ -61,10 +51,7 @@ class PatientRepository {
   }
 
   /**
-   * @brief Cancels an existing appointment.
-   * 
-   * @param appointmentId The ID of the appointment to cancel.
-   * @return True if successful, false otherwise.
+   * Cancels an existing appointment.
    */
   Future<bool> cancelAppointment(String appointmentId) async {
     try {
@@ -72,6 +59,44 @@ class PatientRepository {
       return response.statusCode == 200;
     } catch (e) {
       throw Exception('Failed to cancel appointment: $e');
+    }
+  }
+
+  /**
+   * Fetches all available doctors from the platform.
+   */
+  Future<List<Doctor>> getAllDoctors() async {
+    try {
+      final response = await _apiClient.dio.get('/patients/doctors');
+      final list = response.data['doctors'] as List<dynamic>? ?? [];
+      return list.map((e) => Doctor.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch doctors: $e');
+    }
+  }
+
+  /**
+   * Fetches doctors filtered by a specific department name.
+   */
+  Future<List<Doctor>> getDoctorsByDepartment(String departmentName) async {
+    try {
+      final response = await _apiClient.dio.get('/patients/departments/$departmentName');
+      final list = response.data['doctors'] as List<dynamic>? ?? [];
+      return list.map((e) => Doctor.fromJson(e as Map<String, dynamic>)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch doctors for department: $e');
+    }
+  }
+
+  /**
+   * Fetches the weekly schedule for a specific doctor.
+   */
+  Future<dynamic> getDoctorSchedule(String doctorId) async {
+    try {
+      final response = await _apiClient.dio.get('/patients/doctors/$doctorId/schedule');
+      return response.data['availability'] ?? {};
+    } catch (e) {
+      throw Exception('Failed to fetch doctor schedule: $e');
     }
   }
 }

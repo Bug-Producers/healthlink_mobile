@@ -4,6 +4,9 @@ import 'package:healthlink_mobile/core/models/doctor.dart';
 import 'package:healthlink_mobile/core/widgets/descreption_text.dart';
 import 'package:healthlink_mobile/core/widgets/header_text.dart';
 
+/**
+ * Displays key metrics for a doctor, such as rating, experience, and patient count.
+ */
 class DoctorStats extends StatelessWidget {
   final Doctor doctor;
 

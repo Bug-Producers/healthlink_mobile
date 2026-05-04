@@ -6,8 +6,7 @@ import '../../../../core/models/appointment.dart';
 import '../../providers/appointments_viewmodel_provider.dart';
 
 /**
- * @brief A screen that displays the patient's booked appointments.
- * 
+ * A screen that displays the patient's booked appointments.
  * This screen fetches appointments from the backend via the AppointmentsViewModel
  * and allows the patient to cancel any existing appointment.
  */
@@ -86,12 +85,12 @@ class MyAppointmentsScreen extends ConsumerWidget {
 }
 
 /**
- * @brief A card widget displaying appointment details.
+ * A card widget displaying appointment details.
  */
 class _AppointmentCard extends StatelessWidget {
   /**
-   * @param appointment The typed Appointment model.
-   * @param onCancel The callback triggered when the cancel button is pressed.
+   * appointment The typed Appointment model.
+   * onCancel The callback triggered when the cancel button is pressed.
    */
   final Appointment appointment;
   final VoidCallback onCancel;
@@ -155,13 +154,40 @@ class _AppointmentCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8.h),
+          Row(
+            children: [
+              if (appointment.doctorImage != null && appointment.doctorImage!.isNotEmpty)
+                CircleAvatar(
+                  radius: 20.r,
+                  backgroundImage: NetworkImage(appointment.doctorImage!),
+                )
+              else
+                CircleAvatar(
+                  radius: 20.r,
+                  backgroundColor: const Color(0XFF135bec).withOpacity(0.1),
+                  child: Icon(Icons.person, color: const Color(0XFF135bec), size: 20.r),
+                ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      appointment.doctorName ?? "Doctor",
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
+                    ),
+                    Text(
+                      "Date: ${appointment.date}",
+                      style: TextStyle(fontSize: 12.sp, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
           Text(
             "Time: ${appointment.startTime} - ${appointment.endTime}",
-            style: TextStyle(fontSize: 14.sp, color: Colors.black54),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            "Doctor ID: ${appointment.doctorId}",
             style: TextStyle(fontSize: 14.sp, color: Colors.black54),
           ),
           SizedBox(height: 16.h),

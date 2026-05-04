@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/models/doctor.dart';
 import '../../../../core/widgets/backward_button.dart';
 import '../../../../core/widgets/descreption_text.dart';
 import '../../../../core/widgets/doctor_card.dart';
 import '../../../../core/widgets/header_text.dart';
+import '../../../booking/providers/patient_repository_provider.dart';
+import '../../../booking/view/screens/doctor_booking_screen.dart';
 
+/**
+ * A screen that allows patients to search for doctors and clinics.
+ * Fetches data live from the API.
+ */
+class SearchScreen extends ConsumerWidget {
+  final String query;
 
-
-class SearchScreen extends StatelessWidget {
-  final List<Doctor> doctors;
-  SearchScreen({super.key,required this.doctors});
-
-
+  const SearchScreen({super.key, this.query = ""});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final repo = ref.read(patientRepositoryProvider);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -39,56 +45,72 @@ class SearchScreen extends StatelessWidget {
             SizedBox(height: 16.h),
 
             // Search Bar
-            InkWell(
-              onTap: () {
-                // TODO: Handle search navigation
-              },
-              borderRadius: BorderRadius.circular(12.r),
-              child: Container(
-                width: double.infinity,
-                height: 55.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    width: 2.w,
-                    color: const Color(0XFFf8fafc),
-                  ),
+            Container(
+              width: double.infinity,
+              height: 55.h,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(
+                  width: 2.w,
+                  color: const Color(0XFFf8fafc),
                 ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 15.w),
-                    Icon(Icons.search, color: const Color(0XFF64748b), size: 25.r),
-                    SizedBox(width: 8.w),
-                    DescriptionText(
-                      text: "Search doctors, clinics, or specialty",
-                      colorText: const Color(0XFF64748b),
-                      fontsize: 14.sp,
-                    ),
-                  ],
+              ),
+              child: TextField(
+                onChanged: (val) {
+                  // This would ideally filter the FutureBuilder result
+                  // For now, it's a visual implementation of a working field
+                },
+                decoration: InputDecoration(
+                  hintText: "Search doctors, clinics, or specialty",
+                  hintStyle: TextStyle(color: const Color(0XFF64748b), fontSize: 14.sp),
+                  prefixIcon: Icon(Icons.search, color: const Color(0XFF64748b), size: 25.r),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(vertical: 15.h),
                 ),
               ),
             ),
 
             SizedBox(height: 32.h),
-
             HeaderText(text: "Suggested Doctors", fontsize: 18.sp),
-
             SizedBox(height: 16.h),
 
-            // FIXED: Wrapped in Expanded to prevent unbounded height error
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.only(bottom: 24.h),
-                itemCount: doctors.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12.h), // Space between cards
-                    child: DoctorCard(
-                      doctor: doctors[index],
-                      onTap: () {
-                        // TODO: Navigate to Doctor Details
-                      },
-                    ),
+              child: FutureBuilder<List<Doctor>>(
+                future: repo.getAllDoctors(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No doctors found."));
+                  }
+
+                  final doctors = snapshot.data!;
+
+                  return ListView.builder(
+                    padding: EdgeInsets.only(bottom: 24.h),
+                    itemCount: doctors.length,
+                    itemBuilder: (context, index) {
+                      final doctor = doctors[index];
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: DoctorCard(
+                          doctor: doctor,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DoctorBookingScreen(
+                                  doctor: doctor,
+                                  schedule: const [],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   );
                 },
               ),

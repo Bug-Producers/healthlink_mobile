@@ -4,7 +4,7 @@ import '../core/models/day.dart';
 import '../core/models/day_schedule.dart';
 import '../core/models/doctor.dart';
 import '../core/models/time_slot.dart';
-import '../features/auth/view/screens/search_by_category_screen.dart';
+import '../features/booking/view/screens/search_by_category_screen.dart';
 import '../features/auth/view/screens/search_screen.dart';
 import '../features/booking/view/screens/doctor_booking_screen.dart';
 
@@ -84,4 +84,4 @@ class Sandbox extends StatelessWidget {
       ),
     ];
 
-    return SearchByCategoryScreen(doctors: doctors,);  }  }
+    return const SearchByCategoryScreen(departmentName: "Cardiology");  }  }

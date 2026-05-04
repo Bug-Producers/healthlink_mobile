@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:healthlink_mobile/previews/sandbox.dart';
 import 'core/router/app_router.dart';
-import 'features/auth/view/screens/search_by_category_screen.dart';
+import 'features/booking/view/screens/search_by_category_screen.dart';
 import 'features/auth/view/screens/search_screen.dart';
 import 'firebase_options.dart';
 
