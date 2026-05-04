@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/doctor_booking/doctor_about.dart';
 import '../widgets/doctor_booking/doctor_details.dart';
 import '../widgets/doctor_booking/doctor_stats.dart';
-import '../providers/booking_viewmodel_provider.dart';
+import '../../providers/booking_viewmodel_provider.dart';
 import 'booking_successful_screen.dart';
 
 /**

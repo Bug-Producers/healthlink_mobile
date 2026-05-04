@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/widgets/header_text.dart';
 import '../../../../core/models/appointment.dart';
-import '../providers/appointments_viewmodel_provider.dart';
+import '../../providers/appointments_viewmodel_provider.dart';
 
 /**
  * @brief A screen that displays the patient's booked appointments.
