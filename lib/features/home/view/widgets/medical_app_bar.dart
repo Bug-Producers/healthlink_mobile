@@ -4,6 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../../core/widgets/header_text.dart';
 import '../../../auth/providers/auth_viewmodel_provider.dart';
+import '../../../../features/booking/view/screens/my_appointments_screen.dart';
+
+/**
+ * @brief App bar for the medical home screen.
+ * 
+ * Contains branding, a button to view appointments, and a logout button.
+ */
 
 class MedicalAppBar extends ConsumerWidget {
   const MedicalAppBar({super.key});
@@ -37,7 +44,14 @@ class MedicalAppBar extends ConsumerWidget {
           Spacer(),
           // Calendar button
           InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const MyAppointmentsScreen(),
+                ),
+              );
+            },
             borderRadius: BorderRadius.circular(8.r),
             child: Ink(
               height: 38.h,

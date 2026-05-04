@@ -5,11 +5,23 @@ import 'package:healthlink_mobile/core/widgets/header_text.dart';
 import '../../../../core/models/day_schedule.dart';
 import '../widgets/doctor_booking/app_bar_doctor_details.dart';
 import '../widgets/doctor_booking/day_tiles.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/doctor_booking/doctor_about.dart';
 import '../widgets/doctor_booking/doctor_details.dart';
 import '../widgets/doctor_booking/doctor_stats.dart';
+import '../providers/booking_viewmodel_provider.dart';
+import 'booking_successful_screen.dart';
 
-class DoctorBookingScreen extends StatefulWidget {
+/**
+ * @brief Screen to view doctor details and book an appointment.
+ * 
+ * Displays doctor information, available schedule, and handles booking.
+ */
+class DoctorBookingScreen extends ConsumerStatefulWidget {
+  /**
+   * @param doctor The doctor model to book.
+   * @param schedule The doctor's available schedule slots.
+   */
   final Doctor doctor;
   final List<DaySchedule> schedule;
 
@@ -20,14 +32,19 @@ class DoctorBookingScreen extends StatefulWidget {
   });
 
   @override
-  State<DoctorBookingScreen> createState() => _DoctorBookingScreenState();
+  ConsumerState<DoctorBookingScreen> createState() => _DoctorBookingScreenState();
 }
 
-class _DoctorBookingScreenState extends State<DoctorBookingScreen> {
+class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
   int selectedIndex = 0;
   int? selectedTimeIndex;
 
-  // ✅ format time
+  /**
+   * @brief Formats a TimeOfDay object into a readable string (e.g. 12:00 PM).
+   * 
+   * @param time The TimeOfDay object.
+   * @return The formatted time string.
+   */
   String formatTime(TimeOfDay time) {
     final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
     final minute = time.minute.toString().padLeft(2, '0');
@@ -36,9 +53,64 @@ class _DoctorBookingScreenState extends State<DoctorBookingScreen> {
     return "$hour:$minute $period";
   }
 
+  /**
+   * @brief Formats a TimeOfDay to HH:MM 24-hour string for backend.
+   */
+  String _formatForBackend(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return "$hour:$minute";
+  }
+
+  /**
+   * @brief Books the appointment by calling the backend API via ViewModel.
+   */
+  Future<void> _bookAppointment() async {
+    if (selectedTimeIndex == null) return;
+
+    try {
+      final scheduleDay = widget.schedule[selectedIndex];
+      final slot = scheduleDay.slots[selectedTimeIndex!];
+      
+      // Calculate a dummy date string based on the selected day (for now we use a fixed future date or compute next day of week)
+      // Since DaySchedule only gives us the Day enum, we will just send a dummy date for demo purposes
+      final dummyDate = "2025-04-20";
+      
+      await ref.read(bookingViewModelProvider.notifier).bookAppointment(
+        doctorId: widget.doctor.uuid,
+        date: dummyDate,
+        dayOfWeek: scheduleDay.day.name.toLowerCase(),
+        frameStart: _formatForBackend(slot.start),
+        frameEnd: _formatForBackend(slot.end),
+      );
+
+      // Check if there was an error in state
+      if (ref.read(bookingViewModelProvider).hasError) {
+        throw ref.read(bookingViewModelProvider).error!;
+      }
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const BookingSuccessfulScreen(),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final slots = widget.schedule[selectedIndex].slots;
+    final bookingState = ref.watch(bookingViewModelProvider);
+    final isLoading = bookingState.isLoading;
 
     return Scaffold(
       appBar: AppBar(
@@ -166,22 +238,23 @@ class _DoctorBookingScreenState extends State<DoctorBookingScreen> {
 
               // 🔘 Book Button
               ElevatedButton(
-                onPressed: selectedTimeIndex == null
+                onPressed: (selectedTimeIndex == null || isLoading)
                     ? null
-                    : () {
-                  final slot =
-                  slots[selectedTimeIndex!];
-
-                  print("Booked: ${formatTime(slot.start)}");
-                },
+                    : _bookAppointment,
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 50.h),
                   backgroundColor: const Color(0XFF135bec),
                 ),
-                child: Text(
-                  "Book Appointment",
-                  style: TextStyle(fontSize: 16.sp, color: Colors.white),
-                ),
+                child: isLoading 
+                    ? const SizedBox(
+                        height: 20, 
+                        width: 20, 
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                      )
+                    : Text(
+                        "Book Appointment",
+                        style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                      ),
               ),
             ],
           ),

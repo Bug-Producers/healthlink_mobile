@@ -5,6 +5,11 @@ import '../widgets/booking_successful/appoitment_summary.dart';
 import '../widgets/booking_successful/booking_sucessful_text.dart';
 import '../widgets/booking_successful/confirmation_app_bar.dart';
 
+/**
+ * @brief Screen displayed when a patient successfully books an appointment.
+ * 
+ * Shows a success message and an appointment summary.
+ */
 class BookingSuccessfulScreen extends StatelessWidget {
   const BookingSuccessfulScreen({super.key});
 
