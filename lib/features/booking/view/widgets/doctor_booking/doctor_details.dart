@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/widgets/header_text.dart';
 import '../../screens/doctor_booking_screen.dart';
 
+import '../../../../../core/utils/image_helper.dart';
+
 /**
  * Displays the doctor's profile image, name, department, and location.
  */
@@ -26,7 +28,7 @@ class DoctorDetails extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: DecorationImage(
-              image: NetworkImage(widget.doctor.profileImage),
+              image: ImageHelper.getImageProvider(widget.doctor.profileImage),
               fit: BoxFit.cover,
             ),
           ),

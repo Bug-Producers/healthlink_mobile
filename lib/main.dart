@@ -17,9 +17,17 @@ void main() async {
   await dotenv.load(fileName: ".env");
   
   // Initialize Firebase with platform-specific options
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    if (e.toString().contains('core/duplicate-app')) {
+      await Firebase.initializeApp();
+    } else {
+      rethrow;
+    }
+  }
   
   // Start the app wrapped in a ProviderScope for Riverpod state management
   runApp(const ProviderScope(child: MyApp()));

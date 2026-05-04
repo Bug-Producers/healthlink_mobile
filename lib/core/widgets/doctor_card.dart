@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 
 import '../models/doctor.dart';
+import '../utils/image_helper.dart';
 
 class DoctorCard extends StatelessWidget {
   final Doctor doctor;
@@ -157,7 +158,7 @@ class DoctorImage extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
         image: DecorationImage(
-          image: NetworkImage(doctor.profileImage),
+          image: ImageHelper.getImageProvider(doctor.profileImage),
           fit: BoxFit.contain,
         ),
         color: const Color(0xFFF1F5F9),

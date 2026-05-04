@@ -2,17 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/models/appointment.dart';
 import '../repositories/patient_repository.dart';
 import '../providers/patient_repository_provider.dart';
-import '../../../../core/utils/app_logger.dart'; // Assuming this exists or falls back to print
+import '../../../../core/utils/app_logger.dart';
 
 /**
  * ViewModel for managing the state of a patient's appointments.
  */
 class AppointmentsViewModel extends AsyncNotifier<List<Appointment>> {
-  late final PatientRepository _repo;
+  PatientRepository get _repo => ref.read(patientRepositoryProvider);
 
   @override
   Future<List<Appointment>> build() async {
-    _repo = ref.read(patientRepositoryProvider);
     return _fetchAppointments();
   }
 
@@ -20,37 +19,27 @@ class AppointmentsViewModel extends AsyncNotifier<List<Appointment>> {
     try {
       return await _repo.getAppointments();
     } catch (e, st) {
-      // Add simple print if AppLogger is not available
-      print('Error fetching appointments: $e\n$st');
+      AppLogger.error('Error fetching appointments', error: e, stackTrace: st, name: 'AppointmentsVM');
       rethrow;
     }
   }
 
-  /**
-   * Refreshes the list of appointments.
-   */
+  /// Refreshes the list of appointments.
   Future<void> refresh() async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _fetchAppointments());
   }
 
-  /**
-   * Cancels an appointment and removes it from the list.
-   * id The ID of the appointment to cancel.
-   */
+  /// Cancels an appointment and refreshes the list.
+  /// [id] The ID of the appointment to cancel.
   Future<void> cancelAppointment(String id) async {
-    // We don't want to set the whole screen to loading, just perform the action
-    // and if successful, remove it from the current state.
     try {
       final success = await _repo.cancelAppointment(id);
       if (success && state.hasValue) {
-        final currentList = state.value!;
-        // Filter out the cancelled appointment or just refresh from server
-        // We'll just refresh from server to ensure accuracy
         await refresh();
       }
     } catch (e) {
-      print('Error cancelling appointment: $e');
+      AppLogger.error('Error cancelling appointment', error: e, name: 'AppointmentsVM');
       rethrow;
     }
   }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../../../../core/api/api_client.dart';
 
 /**
  * Repository for managing user authentication via Firebase and Google Sign-In.
@@ -7,11 +8,28 @@ import 'package:google_sign_in/google_sign_in.dart';
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final ApiClient _apiClient = ApiClient();
 
   /**
    * Listens to authentication state changes.
    */
   Stream<User?> authStateChanges() => _auth.authStateChanges();
+
+  /**
+   * Checks if the user is a doctor.
+   */
+  Future<bool> isDoctor(String uid) async {
+    try {
+      final response = await _apiClient.dio.post(
+        '/is-it-doctor',
+        data: {'uuid': uid},
+      );
+      return response.data['isDoctor'] == true;
+    } catch (e) {
+      // Default to false or handle properly
+      return false;
+    }
+  }
 
   /**
    * Logs in a user with email and password.

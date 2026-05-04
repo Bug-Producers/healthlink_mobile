@@ -28,20 +28,28 @@ class Doctor {
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
+    // Helper to safely extract string, even if it's an object with a 'name' field
+    String safeString(dynamic value) {
+      if (value == null) return '';
+      if (value is String) return value;
+      if (value is Map && value.containsKey('name')) return value['name'].toString();
+      return value.toString();
+    }
+
     return Doctor(
-      uuid: json['uuid'] ?? '',
-      name: json['name'] ?? '',
-      department: json['department'] ?? '',
-      city: json['city'] ?? '',
-      country: json['country'] ?? '',
-      clinicName: json['hospitalOrClinicName'] ?? '',
+      uuid: safeString(json['uuid']),
+      name: safeString(json['name']),
+      department: safeString(json['department']),
+      city: safeString(json['city']),
+      country: safeString(json['country']),
+      clinicName: safeString(json['hospitalOrClinicName']),
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       expYears: json['expYears'] ?? 0,
       patients: json['patients'] ?? 0,
-      about: json['about'] ?? '',
-      profileImage: json['profileImage'] ?? '',
+      about: safeString(json['about']),
+      profileImage: safeString(json['profileImage']),
     );
-}
+  }
 
   String patientsFormatted() {
     final f = NumberFormat.decimalPattern();

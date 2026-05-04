@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/widgets/header_text.dart';
+import '../../../../core/widgets/error_placeholder.dart';
 import '../../../../core/models/appointment.dart';
 import '../../providers/appointments_viewmodel_provider.dart';
+import '../../../../core/utils/image_helper.dart';
 
 /**
  * A screen that displays the patient's booked appointments.
@@ -37,9 +39,20 @@ class MyAppointmentsScreen extends ConsumerWidget {
         data: (appointments) {
           if (appointments.isEmpty) {
             return Center(
-              child: Text(
-                "No appointments booked.",
-                style: TextStyle(fontSize: 16.sp, color: Colors.grey),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.calendar_month_outlined, size: 64.r, color: const Color(0xFFCBD5E1)),
+                  SizedBox(height: 16.h),
+                  Text(
+                    "No upcoming appointments",
+                    style: TextStyle(
+                      fontSize: 18.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF64748B),
+                    ),
+                  ),
+                ],
               ),
             );
           }
@@ -73,11 +86,13 @@ class MyAppointmentsScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(
-          child: Text(
-            "Error loading appointments: $err",
-            style: const TextStyle(color: Colors.red),
-          ),
+        error: (err, stack) => ErrorPlaceholder(
+          message: 'Unable to load appointments',
+          error: err,
+          stackTrace: stack,
+          onRetry: () {
+            ref.read(appointmentsViewModelProvider.notifier).refresh();
+          },
         ),
       ),
     );
@@ -159,7 +174,7 @@ class _AppointmentCard extends StatelessWidget {
               if (appointment.doctorImage != null && appointment.doctorImage!.isNotEmpty)
                 CircleAvatar(
                   radius: 20.r,
-                  backgroundImage: NetworkImage(appointment.doctorImage!),
+                  backgroundImage: ImageHelper.getImageProvider(appointment.doctorImage!),
                 )
               else
                 CircleAvatar(

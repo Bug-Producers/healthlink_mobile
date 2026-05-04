@@ -12,7 +12,9 @@ import '../widgets/doctor_booking/doctor_about.dart';
 import '../widgets/doctor_booking/doctor_details.dart';
 import '../widgets/doctor_booking/doctor_stats.dart';
 import 'package:healthlink_mobile/features/booking/providers/booking_viewmodel_provider.dart';
+import 'package:healthlink_mobile/features/booking/providers/appointments_viewmodel_provider.dart';
 import 'package:healthlink_mobile/features/booking/providers/patient_repository_provider.dart';
+import 'package:healthlink_mobile/core/models/doctor_schedule_complete.dart';
 import 'booking_successful_screen.dart';
 
 /**
@@ -36,9 +38,11 @@ class DoctorBookingScreen extends ConsumerStatefulWidget {
 class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
   int selectedIndex = 0;
   int? selectedTimeIndex;
-  DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
+
   List<DaySchedule> _liveSchedule = [];
   bool _isFetchingSchedule = false;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -50,56 +54,77 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
     }
   }
 
+  int _timeToMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
+
+  TimeOfDay _minutesToTime(int m) => TimeOfDay(hour: (m ~/ 60) % 24, minute: m % 60);
+
+  List<TimeSlot> _generateSlots(List<AvailabilityWindow> windows, int duration, int buffer) {
+    List<TimeSlot> slots = [];
+    for (var window in windows) {
+      int currentStart = _timeToMinutes(window.startTime);
+      final endMins = _timeToMinutes(window.endTime);
+
+      while (currentStart + duration <= endMins) {
+        final slotEnd = currentStart + duration;
+        slots.add(TimeSlot(
+          start: _minutesToTime(currentStart),
+          end: _minutesToTime(slotEnd),
+        ));
+        currentStart = slotEnd + buffer;
+      }
+    }
+    return slots;
+  }
+
   /**
    * Fetches the doctor's weekly schedule from the API.
    */
   Future<void> _fetchSchedule() async {
-    setState(() => _isFetchingSchedule = true);
+    setState(() {
+      _isFetchingSchedule = true;
+      _hasError = false;
+    });
     try {
       final repo = ref.read(patientRepositoryProvider);
-      final rawData = await repo.getDoctorSchedule(widget.doctor.uuid);
       
-      // Parse the map availability: {"monday": [...], "tuesday": [...]}
+      final scheduleComplete = await repo.getDoctorScheduleComplete(widget.doctor.uuid);
+      
+      final now = DateTime.now();
+      final upcomingDates = List.generate(14, (i) => now.add(Duration(days: i)));
+      
       final List<DaySchedule> parsed = [];
-      int dayNum = 1;
-      (rawData as Map<String, dynamic>).forEach((key, value) {
+
+      for (var date in upcomingDates) {
+        final dayEnum = Day.values[(date.weekday - 1) % 7];
+        final dayName = dayEnum.name;
+        final dayString = "${dayName[0].toUpperCase()}${dayName.substring(1).toLowerCase()}";
+        
+        final windows = scheduleComplete.availability[dayString] ?? [];
+        if (windows.isEmpty) continue; // Skip days with no availability
+
+        final slots = _generateSlots(windows, scheduleComplete.appointmentDuration, scheduleComplete.bufferTime);
+        if (slots.isEmpty) continue; // Skip if no slots can be generated
+
         parsed.add(DaySchedule(
-          day: Day.values.firstWhere(
-            (e) => e.name.toLowerCase() == key.toLowerCase(), 
-            orElse: () => Day.MON,
-          ),
-          number: dayNum++,
-          slots: (value as List).map((e) => TimeSlot.fromJson(e)).toList(),
+          day: dayEnum,
+          number: date.day,
+          date: date,
+          slots: slots,
         ));
-      });
+      }
 
       setState(() {
         _liveSchedule = parsed;
         _isFetchingSchedule = false;
+        selectedIndex = 0;
+        selectedTimeIndex = null;
       });
     } catch (e) {
-      setState(() => _isFetchingSchedule = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to load schedule: $e"), backgroundColor: Colors.red),
-        );
-      }
-    }
-  }
-
-  /**
-   * Opens a date picker to select the appointment date.
-   */
-  Future<void> _selectDate() async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 90)),
-    );
-    if (picked != null && picked != selectedDate) {
+      debugPrint('Failed to load schedule: $e');
       setState(() {
-        selectedDate = picked;
+        _isFetchingSchedule = false;
+        _hasError = true;
+        _errorMessage = "We couldn't connect to the server to get the schedule. Please check your connection and try again.";
       });
     }
   }
@@ -134,7 +159,8 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
       final scheduleDay = _liveSchedule[selectedIndex];
       final slot = scheduleDay.slots[selectedTimeIndex!];
       
-      final dateStr = "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}";
+      final dateToBook = scheduleDay.date ?? DateTime.now();
+      final dateStr = "${dateToBook.year}-${dateToBook.month.toString().padLeft(2, '0')}-${dateToBook.day.toString().padLeft(2, '0')}";
       final timeRange = "${formatTime(slot.start)} - ${formatTime(slot.end)}";
       
       await ref.read(bookingViewModelProvider.notifier).bookAppointment(
@@ -149,6 +175,9 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
       if (state.hasError) {
         throw state.error!;
       }
+
+      // Refresh appointments list in the background
+      ref.invalidate(appointmentsViewModelProvider);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -167,12 +196,52 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
         );
       }
     } catch (e) {
+      debugPrint('Booking failed: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Booking failed: ${e.toString()}"), backgroundColor: Colors.red),
+          SnackBar(content: Text("Booking failed. Please try again."), backgroundColor: Colors.red),
         );
       }
     }
+  }
+
+  Widget _buildErrorWidget() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 16.w),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: Colors.red.withOpacity(0.2)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.cloud_off_rounded, color: Colors.red[400], size: 40.sp),
+          SizedBox(height: 12.h),
+          Text(
+            "Connection Error",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp, color: Colors.red[800]),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            _errorMessage,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 13.sp, color: Colors.red[600]),
+          ),
+          SizedBox(height: 16.h),
+          ElevatedButton.icon(
+            onPressed: _fetchSchedule,
+            icon: Icon(Icons.refresh_rounded, size: 18.sp, color: Colors.white),
+            label: Text("Retry Connection", style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[400],
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -200,37 +269,6 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
               DoctorAbout(widget: widget),
               SizedBox(height: 24.h),
 
-              // 📅 Date Selection
-              InkWell(
-                onTap: _selectDate,
-                child: Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: const Color(0XFFe2e8f0), width: 1.w),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.calendar_month_outlined, color: const Color(0XFF135bec), size: 24.r),
-                      SizedBox(width: 12.w),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Appointment Date", style: TextStyle(color: const Color(0XFF64748b), fontSize: 12.sp)),
-                          Text(
-                            "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.sp),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_drop_down, color: Color(0XFF64748b)),
-                    ],
-                  ),
-                ),
-              ),
-
               SizedBox(height: 24.h),
 
               Container(
@@ -256,84 +294,96 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
                     HeaderText(text: "Select Schedule", fontsize: 18.sp),
                     SizedBox(height: 20.h),
 
-                    SizedBox(
-                      height: 100.h,
-                      child: _isFetchingSchedule 
-                        ? const Center(child: CircularProgressIndicator())
-                        : _liveSchedule.isEmpty 
-                          ? Center(child: Text("No schedule available", style: TextStyle(fontSize: 14.sp)))
-                          : ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _liveSchedule.length,
-                            itemBuilder: (context, index) {
-                              return Padding(
-                                padding: EdgeInsets.only(right: 10.w),
-                                child: DayTile(
-                                  isSelected: index == selectedIndex,
-                                  dayName: _liveSchedule[index].day.name,
-                                  dayNumber: _liveSchedule[index].number.toString(),
+                    if (_hasError)
+                      _buildErrorWidget()
+                    else if (_isFetchingSchedule)
+                      SizedBox(
+                        height: 100.h,
+                        child: const Center(child: CircularProgressIndicator())
+                      )
+                    else if (_liveSchedule.isEmpty)
+                      SizedBox(
+                        height: 100.h, 
+                        child: Center(
+                          child: Text("No schedule available for the next 14 days.", style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]))
+                        )
+                      )
+                    else ...[
+                      SizedBox(
+                        height: 100.h,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _liveSchedule.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(right: 10.w),
+                              child: DayTile(
+                                isSelected: index == selectedIndex,
+                                dayName: _liveSchedule[index].day.name,
+                                dayNumber: _liveSchedule[index].number.toString(),
+                                onTap: () {
+                                  setState(() {
+                                    selectedIndex = index;
+                                    selectedTimeIndex = null;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+
+                      SizedBox(height: 20.h),
+                      HeaderText(text: "Available Time", fontsize: 18.sp),
+                      SizedBox(height: 12.h),
+
+                      slots.isEmpty
+                          ? Center(
+                              child: Text(
+                                "No available times for this day",
+                                style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]),
+                              ),
+                            )
+                          : Wrap(
+                              spacing: 10.w,
+                              runSpacing: 10.h,
+                              children: slots.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                var slot = entry.value;
+
+                                bool isSelected = selectedTimeIndex == index;
+
+                                return GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      selectedIndex = index;
-                                      selectedTimeIndex = null;
+                                      selectedTimeIndex = index;
                                     });
                                   },
-                                ),
-                              );
-                            },
-                          ),
-                    ),
-
-                    SizedBox(height: 20.h),
-                    HeaderText(text: "Available Time", fontsize: 18.sp),
-                    SizedBox(height: 12.h),
-
-                    slots.isEmpty
-                        ? Center(
-                      child: Text(
-                        "No available times",
-                        style: TextStyle(fontSize: 14.sp),
-                      ),
-                    )
-                        : Wrap(
-                      spacing: 10.w,
-                      runSpacing: 10.h,
-                      children: slots.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        var slot = entry.value;
-
-                        bool isSelected = selectedTimeIndex == index;
-
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedTimeIndex = index;
-                            });
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 10.h),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? const Color(0XFF135bec)
-                                  : const Color(0XFF135bec)
-                                  .withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8.r),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w, vertical: 10.h),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? const Color(0XFF135bec)
+                                          : const Color(0XFF135bec)
+                                              .withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8.r),
+                                    ),
+                                    child: Text(
+                                      "${formatTime(slot.start)} - ${formatTime(slot.end)}",
+                                      style: TextStyle(
+                                        color: isSelected
+                                            ? Colors.white
+                                            : const Color(0XFF135bec),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14.sp,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
-                            child: Text(
-                              "${formatTime(slot.start)} - ${formatTime(slot.end)}",
-                              style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : const Color(0XFF135bec),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                    ],
                   ],
                 ),
               ),

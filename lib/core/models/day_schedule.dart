@@ -6,12 +6,13 @@ class DaySchedule {
   final Day day;
   final int number;
   final List<TimeSlot> slots;
+  final DateTime? date;
 
-    DaySchedule({
+  DaySchedule({
     required this.day,
     required this.number,
     required this.slots,
-
+    this.date,
   });
 
   factory DaySchedule.fromJson(Map<String, dynamic> json) {

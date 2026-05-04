@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../providers/auth_repository_provider.dart';
@@ -83,6 +83,15 @@ class AuthViewModel extends AsyncNotifier<User?> {
 
   Future<void> forgetPassword(String email) async {
     await _repo.forgetPassword(email);
+  }
+
+  Future<bool> isDoctor(String uid) async {
+    try {
+      return await _repo.isDoctor(uid);
+    } catch (e) {
+      AppLogger.error('Failed to check if user is doctor', error: e, name: 'AuthViewModel');
+      return false;
+    }
   }
 
   Future<void> logout() async {

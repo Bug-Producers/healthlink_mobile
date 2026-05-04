@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/models/doctor.dart';
 import '../../../../core/widgets/backward_button.dart';
 import '../../../../core/widgets/doctor_card.dart';
+import '../../../../core/widgets/error_placeholder.dart';
 import '../../../../core/widgets/header_text.dart';
 import '../../../booking/providers/patient_repository_provider.dart';
 import '../../../booking/view/screens/doctor_booking_screen.dart';
@@ -12,15 +13,37 @@ import '../../../booking/view/screens/doctor_booking_screen.dart';
  * Displays a list of doctors filtered by the selected department.
  * Fetches data live from the API.
  */
-class SearchByCategoryScreen extends ConsumerWidget {
+class SearchByCategoryScreen extends ConsumerStatefulWidget {
   final String departmentName;
 
   const SearchByCategoryScreen({super.key, required this.departmentName});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final repo = ref.read(patientRepositoryProvider);
+  ConsumerState<SearchByCategoryScreen> createState() => _SearchByCategoryScreenState();
+}
 
+class _SearchByCategoryScreenState extends ConsumerState<SearchByCategoryScreen> {
+  late Future<List<Doctor>> _doctorsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDoctors();
+  }
+
+  void _loadDoctors() {
+    final repo = ref.read(patientRepositoryProvider);
+    _doctorsFuture = repo.getDoctorsByDepartment(widget.departmentName);
+  }
+
+  void _retry() {
+    setState(() {
+      _loadDoctors();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -29,21 +52,26 @@ class SearchByCategoryScreen extends ConsumerWidget {
         leading: const BackWardButton(),
         centerTitle: true,
         title: HeaderText(
-          text: departmentName,
+          text: widget.departmentName,
           fontsize: 18.sp,
           fontWeight: FontWeight.bold,
         ),
       ),
       body: SafeArea(
         child: FutureBuilder<List<Doctor>>(
-          future: repo.getDoctorsByDepartment(departmentName),
+          future: _doctorsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text("Error fetching doctors: ${snapshot.error}"));
+              return ErrorPlaceholder(
+                message: 'Unable to load doctors',
+                error: snapshot.error,
+                stackTrace: snapshot.stackTrace,
+                onRetry: _retry,
+              );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text("No doctors found for $departmentName."));
+              return Center(child: Text("No doctors found for ${widget.departmentName}."));
             }
 
             final doctors = snapshot.data!;
