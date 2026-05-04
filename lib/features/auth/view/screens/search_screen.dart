@@ -26,6 +26,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   late Future<List<Doctor>> _doctorsFuture;
   String _searchQuery = "";
   String _sortBy = "Recommended";
+  bool _sortDescending = true;
 
   @override
   void initState() {
@@ -98,40 +99,63 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 HeaderText(text: "Suggested Doctors", fontsize: 18.sp),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F5F9),
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _sortBy,
-                    icon: Icon(Icons.sort, size: 18.r, color: const Color(0xFF334155)),
-                    elevation: 16,
-                    style: TextStyle(color: const Color(0xFF334155), fontSize: 14.sp, fontWeight: FontWeight.w500),
-                    underline: const SizedBox(),
-                    onChanged: (String? value) {
-                      if (value != null) {
-                        setState(() {
-                          _sortBy = value;
-                        });
-                      }
-                    },
-                    items: [
-                      "Recommended", 
-                      "Rating: High to Low", 
-                      "Rating: Low to High",
-                      "Patients: High to Low",
-                      "Patients: Low to High",
-                      "Experience: High to Low",
-                      "Experience: Low to High"
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: DropdownButton<String>(
+                        value: _sortBy,
+                        icon: Icon(Icons.keyboard_arrow_down, size: 18.r, color: const Color(0xFF334155)),
+                        elevation: 16,
+                        style: TextStyle(color: const Color(0xFF334155), fontSize: 14.sp, fontWeight: FontWeight.w500),
+                        underline: const SizedBox(),
+                        onChanged: (String? value) {
+                          if (value != null) {
+                            setState(() {
+                              _sortBy = value;
+                            });
+                          }
+                        },
+                        items: [
+                          "Recommended", 
+                          "Rating", 
+                          "Patients",
+                          "Experience"
+                        ].map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    if (_sortBy != "Recommended") ...[
+                      SizedBox(width: 8.w),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _sortDescending = !_sortDescending;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10.r),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          child: Icon(
+                            _sortDescending ? Icons.arrow_downward : Icons.arrow_upward,
+                            size: 18.r,
+                            color: const Color(0xFF334155),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
             ),
@@ -168,18 +192,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   }
 
                   // Client-side Sorting
-                  if (_sortBy == "Rating: High to Low") {
-                    doctors.sort((a, b) => b.rating.compareTo(a.rating));
-                  } else if (_sortBy == "Rating: Low to High") {
-                    doctors.sort((a, b) => a.rating.compareTo(b.rating));
-                  } else if (_sortBy == "Patients: High to Low") {
-                    doctors.sort((a, b) => b.patients.compareTo(a.patients));
-                  } else if (_sortBy == "Patients: Low to High") {
-                    doctors.sort((a, b) => a.patients.compareTo(b.patients));
-                  } else if (_sortBy == "Experience: High to Low") {
-                    doctors.sort((a, b) => b.expYears.compareTo(a.expYears));
-                  } else if (_sortBy == "Experience: Low to High") {
-                    doctors.sort((a, b) => a.expYears.compareTo(b.expYears));
+                  if (_sortBy == "Rating") {
+                    doctors.sort((a, b) => _sortDescending ? b.rating.compareTo(a.rating) : a.rating.compareTo(b.rating));
+                  } else if (_sortBy == "Patients") {
+                    doctors.sort((a, b) => _sortDescending ? b.patients.compareTo(a.patients) : a.patients.compareTo(b.patients));
+                  } else if (_sortBy == "Experience") {
+                    doctors.sort((a, b) => _sortDescending ? b.expYears.compareTo(a.expYears) : a.expYears.compareTo(b.expYears));
                   }
 
                   if (doctors.isEmpty) {
