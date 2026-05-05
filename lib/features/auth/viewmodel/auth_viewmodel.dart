@@ -3,9 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../providers/auth_repository_provider.dart';
 import '../../../../core/utils/app_logger.dart';
+import '../../booking/providers/patient_repository_provider.dart';
 
 class AuthViewModel extends AsyncNotifier<User?> {
   late final AuthRepository _repo;
+
+  Future<void> _syncProfileToBackend(User user) async {
+    try {
+      final patientRepo = ref.read(patientRepositoryProvider);
+      await patientRepo.registerPatient({
+        'name': user.displayName ?? user.email?.split('@')[0] ?? 'Patient',
+        'email': user.email ?? '',
+        'dateOfBirth': '2000-01-01', // Default placeholder required by some DB constraints
+        'gender': 'Not specified',
+      });
+      AppLogger.info('Successfully synced patient profile to backend for ${user.uid}', 'AuthViewModel');
+    } catch (e) {
+      AppLogger.error('Failed to sync patient profile to backend', error: e, name: 'AuthViewModel');
+    }
+  }
 
   @override
   Future<User?> build() async {
@@ -13,6 +29,8 @@ class AuthViewModel extends AsyncNotifier<User?> {
     final user = _repo.currentUser;
     if (user != null) {
       await user.reload();
+      // Ensure backend profile exists
+      _syncProfileToBackend(_repo.currentUser!);
       return _repo.currentUser;
     }
     return null;
@@ -25,6 +43,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
       try {
         final result = await _repo.login(email: email, password: password);
         AppLogger.info('Login successful', 'AuthViewModel');
+        if (result.user != null) {
+          await _syncProfileToBackend(result.user!);
+        }
         return result.user;
       } catch (e, st) {
         AppLogger.error('Login failed', error: e, stackTrace: st, name: 'AuthViewModel');
@@ -44,6 +65,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
           username: username,
         );
         AppLogger.info('Registration successful', 'AuthViewModel');
+        if (result.user != null) {
+          await _syncProfileToBackend(result.user!);
+        }
         return result.user;
       } catch (e, st) {
         AppLogger.error('Registration failed', error: e, stackTrace: st, name: 'AuthViewModel');
@@ -63,6 +87,9 @@ class AuthViewModel extends AsyncNotifier<User?> {
           return null;
         }
         AppLogger.info('Google Sign-In successful', 'AuthViewModel');
+        if (result.user != null) {
+          await _syncProfileToBackend(result.user!);
+        }
         return result.user;
       } catch (e, st) {
         AppLogger.error('Google Sign-In failed', error: e, stackTrace: st, name: 'AuthViewModel');

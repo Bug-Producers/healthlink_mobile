@@ -27,33 +27,37 @@ class BookingSuccessfulScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: ConfirmationAppBar(),
         backgroundColor: Colors.transparent,
       ),
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: Column(
-            children: [
-              SizedBox(height: 55.h),
-              BookingSucessfulText(),
-              SizedBox(height: 37.h),
-              AppointmentSummary(
-                doctorName: doctorName,
-                date: date,
-                timeRange: timeRange,
-                allocatedTime: allocatedTime,
-              ),
-              SizedBox(height: 31.h),
-              GlobalButton(
-                text: "Done",
-                height: 56.h,
-                width: 342.w,
-                onPressed: () {
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                },
-              ),
-            ],
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: [
+                SizedBox(height: 55.h),
+                BookingSucessfulText(),
+                SizedBox(height: 37.h),
+                AppointmentSummary(
+                  doctorName: doctorName,
+                  date: date,
+                  timeRange: timeRange,
+                  allocatedTime: allocatedTime,
+                ),
+                SizedBox(height: 31.h),
+                GlobalButton(
+                  text: "Done",
+                  height: 56.h,
+                  width: 342.w,
+                  onPressed: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                ),
+                SizedBox(height: 20.h),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../../../../core/api/api_client.dart';
 import '../../../../core/models/appointment.dart';
 import '../../../../core/models/doctor.dart';
@@ -21,6 +22,15 @@ class PatientRepository {
       return response.data;
     } catch (e) {
       throw Exception('Failed to fetch patient profile: $e');
+    }
+  }
+
+  Future<bool> registerPatient(Map<String, dynamic> data) async {
+    try {
+      final response = await _apiClient.dio.post('/patients/register', data: data);
+      return response.statusCode == 201 || response.statusCode == 200;
+    } catch (e) {
+      throw Exception('Failed to register patient profile: $e');
     }
   }
 
@@ -110,17 +120,25 @@ class PatientRepository {
     required String frameEnd,
   }) async {
     try {
+      final payload = {
+        'doctorId': doctorId,
+        'date': date,
+        'dayOfWeek': dayOfWeek,
+        'frameStart': frameStart,
+        'frameEnd': frameEnd,
+      };
+      debugPrint('[Booking] Sending request to /patients/appointments/book');
+      debugPrint('[Booking] Payload: $payload');
       final response = await _apiClient.dio.post(
         '/patients/appointments/book',
-        data: {
-          'doctorId': doctorId,
-          'date': date,
-          'dayOfWeek': dayOfWeek,
-          'frameStart': frameStart,
-          'frameEnd': frameEnd,
-        },
+        data: payload,
       );
+      debugPrint('[Booking] Success: ${response.data}');
       return response.data;
+    } on DioException catch (e) {
+      debugPrint('[Booking] ❌ DioException: ${e.response?.statusCode}');
+      debugPrint('[Booking] ❌ Response body: ${e.response?.data}');
+      throw Exception('Failed to book appointment: $e');
     } catch (e) {
       throw Exception('Failed to book appointment: $e');
     }
@@ -130,7 +148,8 @@ class PatientRepository {
     try {
       final response = await _apiClient.dio.get('/patients/appointments');
       final list = response.data['appointments'] as List<dynamic>? ?? [];
-      return list.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+      final appointments = list.map((e) => Appointment.fromJson(e as Map<String, dynamic>)).toList();
+      return appointments;
     } on DioException catch (e) {
       if (e.response?.statusCode == 404 || e.response?.statusCode == 400) {
         return [];

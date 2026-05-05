@@ -16,6 +16,7 @@ class BookingViewModel extends AsyncNotifier<void> {
 
   /**
    * Books an appointment, handling the loading and error states.
+   * Returns the full response map from the backend on success.
    * 
    * @param doctorId The ID of the doctor.
    * @param date The chosen date.
@@ -23,7 +24,7 @@ class BookingViewModel extends AsyncNotifier<void> {
    * @param frameStart The start time.
    * @param frameEnd The end time.
    */
-  Future<void> bookAppointment({
+  Future<Map<String, dynamic>?> bookAppointment({
     required String doctorId,
     required String date,
     required String dayOfWeek,
@@ -31,14 +32,17 @@ class BookingViewModel extends AsyncNotifier<void> {
     required String frameEnd,
   }) async {
     state = const AsyncLoading();
+    Map<String, dynamic>? result;
     state = await AsyncValue.guard(() async {
-      await _repo.bookAppointment(
+      final response = await _repo.bookAppointment(
         doctorId: doctorId,
         date: date,
         dayOfWeek: dayOfWeek,
         frameStart: frameStart,
         frameEnd: frameEnd,
       );
+      result = response;
     });
+    return result;
   }
 }

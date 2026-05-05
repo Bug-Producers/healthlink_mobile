@@ -56,9 +56,7 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
 
   int _timeToMinutes(TimeOfDay t) => t.hour * 60 + t.minute;
 
-  TimeOfDay _minutesToTime(int m) => TimeOfDay(hour: (m ~/ 60) % 24, minute: m % 60);
-
-  List<TimeSlot> _generateSlots(List<AvailabilityWindow> windows, int duration, int buffer, DateTime date) {
+  List<TimeSlot> _generateSlots(List<AvailabilityWindow> windows, DateTime date) {
     List<TimeSlot> slots = [];
     final now = DateTime.now();
     final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
@@ -66,21 +64,41 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
 
     for (var window in windows) {
       int currentStart = _timeToMinutes(window.startTime);
-      final endMins = _timeToMinutes(window.endTime);
 
-      while (currentStart + duration <= endMins) {
-        final slotEnd = currentStart + duration;
-        
-        if (!isToday || currentStart > currentMinutes) {
-          slots.add(TimeSlot(
-            start: _minutesToTime(currentStart),
-            end: _minutesToTime(slotEnd),
-          ));
-        }
-        currentStart = slotEnd + buffer;
+      if (!isToday || currentStart > currentMinutes) {
+        slots.add(TimeSlot(
+          start: window.startTime,
+          end: window.endTime,
+        ));
       }
     }
     return slots;
+  }
+
+  String _getFullDayName(int weekday) {
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return days[weekday - 1];
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: isError ? Colors.red : Colors.green,
+        ),
+      );
   }
 
   /**
@@ -97,23 +115,18 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
       final scheduleComplete = await repo.getDoctorScheduleComplete(widget.doctor.uuid);
       
       final now = DateTime.now();
-      final upcomingDates = List.generate(14, (i) => now.add(Duration(days: i)));
+      final upcomingDates = List.generate(30, (i) => now.add(Duration(days: i)));
       
       final List<DaySchedule> parsed = [];
 
-      String _getFullDayName(int weekday) {
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        return days[weekday - 1];
-      }
-
       for (var date in upcomingDates) {
         final dayEnum = Day.values[(date.weekday - 1) % 7];
-        final dayString = _getFullDayName(date.weekday);
+        final dayString = _getFullDayName(date.weekday).toLowerCase();
         
         final windows = scheduleComplete.availability[dayString] ?? [];
         if (windows.isEmpty) continue; // Skip days with no availability
 
-        final slots = _generateSlots(windows, scheduleComplete.appointmentDuration, scheduleComplete.bufferTime, date);
+        final slots = _generateSlots(windows, date);
         if (slots.isEmpty) continue; // Skip if no slots can be generated
 
         parsed.add(DaySchedule(
@@ -124,18 +137,20 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
         ));
       }
 
+
       setState(() {
         _liveSchedule = parsed;
         _isFetchingSchedule = false;
         selectedIndex = 0;
         selectedTimeIndex = null;
       });
-    } catch (e) {
-      debugPrint('Failed to load schedule: $e');
+    } catch (e, stackTrace) {
+      debugPrint('[Schedule] ❌ Failed to load schedule: $e');
+      debugPrint('[Schedule] Stack trace: $stackTrace');
       setState(() {
         _isFetchingSchedule = false;
         _hasError = true;
-        _errorMessage = "We couldn't connect to the server to get the schedule. Please check your connection and try again.";
+        _errorMessage = "We couldn't load the doctor's schedule. Please check your connection and try again.";
       });
     }
   }
@@ -164,60 +179,66 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
    * Books the appointment by calling the backend API via ViewModel.
    */
   Future<void> _bookAppointment() async {
-    if (selectedTimeIndex == null) return;
+    if (_liveSchedule.isEmpty || selectedTimeIndex == null) return;
+    if (selectedIndex < 0 || selectedIndex >= _liveSchedule.length) return;
 
     try {
       final scheduleDay = _liveSchedule[selectedIndex];
       final slot = scheduleDay.slots[selectedTimeIndex!];
-      
+
       final dateToBook = scheduleDay.date ?? DateTime.now();
-      final dateStr = "${dateToBook.year}-${dateToBook.month.toString().padLeft(2, '0')}-${dateToBook.day.toString().padLeft(2, '0')}";
+      final dateStr =
+          "${dateToBook.year}-${dateToBook.month.toString().padLeft(2, '0')}-${dateToBook.day.toString().padLeft(2, '0')}";
+
       final timeRange = "${formatTime(slot.start)} - ${formatTime(slot.end)}";
-      
-      String _getFullDayName(int weekday) {
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-        return days[weekday - 1];
+
+      final bookingResponse =
+          await ref.read(bookingViewModelProvider.notifier).bookAppointment(
+                doctorId: widget.doctor.uuid,
+                date: dateStr,
+                dayOfWeek: _getFullDayName(dateToBook.weekday).toLowerCase(),
+                frameStart: _formatForBackend(slot.start),
+                frameEnd: _formatForBackend(slot.end),
+              );
+
+      final bookingState = ref.read(bookingViewModelProvider);
+      if (bookingState.hasError) {
+        throw Exception(bookingState.error?.toString() ?? 'Unknown booking error');
       }
 
-      await ref.read(bookingViewModelProvider.notifier).bookAppointment(
-        doctorId: widget.doctor.uuid,
-        date: dateStr,
-        dayOfWeek: _getFullDayName(dateToBook.weekday),
-        frameStart: _formatForBackend(slot.start),
-        frameEnd: _formatForBackend(slot.end),
-      );
-
-      final state = ref.read(bookingViewModelProvider);
-      if (state.hasError) {
-        throw state.error!;
-      }
-
-      // Refresh appointments list in the background
-      ref.invalidate(appointmentsViewModelProvider);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Appointment booked successfully!")),
+      // Cache the appointment locally so it shows on the home screen immediately
+      if (bookingResponse != null) {
+        ref.read(appointmentsViewModelProvider.notifier).addFromBookingResponse(
+          bookingResponse,
+          doctorName: widget.doctor.name,
+          doctorImage: widget.doctor.profileImage,
         );
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BookingSuccessfulScreen(
-              doctorName: widget.doctor.name,
-              date: dateStr,
-              timeRange: timeRange,
-              allocatedTime: formatTime(slot.start),
-            ),
+      }
+
+      final allocatedStart = bookingResponse?['startTime'] as String?;
+      final allocatedEnd = bookingResponse?['endTime'] as String?;
+      String? allocatedTime;
+      if (allocatedStart != null && allocatedEnd != null) {
+        allocatedTime = "$allocatedStart - $allocatedEnd";
+      } else {
+        allocatedTime = allocatedStart;
+      }
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BookingSuccessfulScreen(
+            doctorName: widget.doctor.name,
+            date: dateStr,
+            timeRange: timeRange,
+            allocatedTime: allocatedTime ?? formatTime(slot.start),
           ),
-        );
-      }
+        ),
+      );
     } catch (e) {
-      debugPrint('Booking failed: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Booking failed. Please try again."), backgroundColor: Colors.red),
-        );
-      }
+      debugPrint('[Booking] ❌ Failed: $e');
+      _showSnackBar("Booking failed: ${e.toString()}", isError: true);
     }
   }
 
@@ -262,7 +283,7 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final slots = _liveSchedule.isNotEmpty ? _liveSchedule[selectedIndex].slots : [];
+    final slots = _liveSchedule.isNotEmpty ? _liveSchedule[selectedIndex].slots : <TimeSlot>[];
     final bookingState = ref.watch(bookingViewModelProvider);
     final isLoading = bookingState.isLoading;
 
@@ -321,7 +342,7 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
                       SizedBox(
                         height: 100.h, 
                         child: Center(
-                          child: Text("No schedule available for the next 14 days.", style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]))
+                          child: Text("No schedule available for the next 30 days.", style: TextStyle(fontSize: 14.sp, color: Colors.grey[600]))
                         )
                       )
                     else ...[

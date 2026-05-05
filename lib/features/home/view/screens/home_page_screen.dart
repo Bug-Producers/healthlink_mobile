@@ -5,6 +5,7 @@ import '../widgets/home_page_text.dart';
 import '../widgets/medical_app_bar.dart';
 import '../widgets/medical_specialties_grid_buttons.dart';
 import '../widgets/search_button_in_home_page.dart';
+import '../widgets/upcoming_appointment_widget.dart';
 
 /**
  * The main home screen for patients.
@@ -20,18 +21,20 @@ class HomePageScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: Column(
-            children: [
-              SizedBox(height: 10.h),
-              MedicalAppBar(),
-              SizedBox(
-                width: 333.w,
-                child: Divider(height: 23.h, color: Color(0XFFe2e8f0)),
-              ),
-              HomePageText(),
-              SizedBox(height: 10.h),
-              SearchButtonInHomePage(),
-              SizedBox(height: 24.h),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 10.h),
+                MedicalAppBar(),
+                SizedBox(
+                  width: 333.w,
+                  child: Divider(height: 23.h, color: Color(0XFFe2e8f0)),
+                ),
+                HomePageText(),
+                SizedBox(height: 10.h),
+                SearchButtonInHomePage(),
+                const UpcomingAppointmentWidget(),
+                SizedBox(height: 24.h),
               SizedBox(
                 width: 333.w,
                 child: HeaderText(
@@ -44,6 +47,7 @@ class HomePageScreen extends StatelessWidget {
               MedicalSpecialtiesGridButtons(),
             ],
           ),
+        ),
         ),
       ),
     );
