@@ -58,18 +58,25 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
 
   TimeOfDay _minutesToTime(int m) => TimeOfDay(hour: (m ~/ 60) % 24, minute: m % 60);
 
-  List<TimeSlot> _generateSlots(List<AvailabilityWindow> windows, int duration, int buffer) {
+  List<TimeSlot> _generateSlots(List<AvailabilityWindow> windows, int duration, int buffer, DateTime date) {
     List<TimeSlot> slots = [];
+    final now = DateTime.now();
+    final isToday = date.year == now.year && date.month == now.month && date.day == now.day;
+    final currentMinutes = now.hour * 60 + now.minute;
+
     for (var window in windows) {
       int currentStart = _timeToMinutes(window.startTime);
       final endMins = _timeToMinutes(window.endTime);
 
       while (currentStart + duration <= endMins) {
         final slotEnd = currentStart + duration;
-        slots.add(TimeSlot(
-          start: _minutesToTime(currentStart),
-          end: _minutesToTime(slotEnd),
-        ));
+        
+        if (!isToday || currentStart > currentMinutes) {
+          slots.add(TimeSlot(
+            start: _minutesToTime(currentStart),
+            end: _minutesToTime(slotEnd),
+          ));
+        }
         currentStart = slotEnd + buffer;
       }
     }
@@ -94,15 +101,19 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
       
       final List<DaySchedule> parsed = [];
 
+      String _getFullDayName(int weekday) {
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        return days[weekday - 1];
+      }
+
       for (var date in upcomingDates) {
         final dayEnum = Day.values[(date.weekday - 1) % 7];
-        final dayName = dayEnum.name;
-        final dayString = "${dayName[0].toUpperCase()}${dayName.substring(1).toLowerCase()}";
+        final dayString = _getFullDayName(date.weekday);
         
         final windows = scheduleComplete.availability[dayString] ?? [];
         if (windows.isEmpty) continue; // Skip days with no availability
 
-        final slots = _generateSlots(windows, scheduleComplete.appointmentDuration, scheduleComplete.bufferTime);
+        final slots = _generateSlots(windows, scheduleComplete.appointmentDuration, scheduleComplete.bufferTime, date);
         if (slots.isEmpty) continue; // Skip if no slots can be generated
 
         parsed.add(DaySchedule(
@@ -163,10 +174,15 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
       final dateStr = "${dateToBook.year}-${dateToBook.month.toString().padLeft(2, '0')}-${dateToBook.day.toString().padLeft(2, '0')}";
       final timeRange = "${formatTime(slot.start)} - ${formatTime(slot.end)}";
       
+      String _getFullDayName(int weekday) {
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        return days[weekday - 1];
+      }
+
       await ref.read(bookingViewModelProvider.notifier).bookAppointment(
         doctorId: widget.doctor.uuid,
         date: dateStr,
-        dayOfWeek: scheduleDay.day.name.toLowerCase(),
+        dayOfWeek: _getFullDayName(dateToBook.weekday),
         frameStart: _formatForBackend(slot.start),
         frameEnd: _formatForBackend(slot.end),
       );

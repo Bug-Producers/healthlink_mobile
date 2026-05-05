@@ -22,7 +22,7 @@ class ApiClient {
   }
 
   ApiClient._internal() {
-    final baseUrl = dotenv.env['API_BASE_URL'] ?? 'https://healthlink-api.loca.lt/api';
+    final baseUrl = dotenv.env['API_BASE_URL'];
 
     dio = Dio(
       BaseOptions(
