@@ -299,11 +299,11 @@ class _DoctorBookingScreenState extends ConsumerState<DoctorBookingScreen> {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           child: Column(
             children: [
-              DoctorDetails(widget: widget),
+              DoctorDetails(doctor: widget.doctor),
               SizedBox(height: 40.h),
               DoctorStats(doctor: widget.doctor),
               SizedBox(height: 37.h),
-              DoctorAbout(widget: widget),
+              DoctorAbout(doctor: widget.doctor),
               SizedBox(height: 24.h),
 
               SizedBox(height: 24.h),

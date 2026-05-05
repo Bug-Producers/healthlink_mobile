@@ -5,7 +5,9 @@ import '../../../../core/widgets/header_text.dart';
 import '../../../../core/widgets/error_placeholder.dart';
 import '../../../../core/models/appointment.dart';
 import '../../providers/appointments_viewmodel_provider.dart';
+import '../../providers/patient_repository_provider.dart';
 import '../../../../core/utils/image_helper.dart';
+import '../widgets/rate_doctor_sheet.dart';
 
 /**
  * A screen that displays the patient's booked appointments.
@@ -81,6 +83,31 @@ class MyAppointmentsScreen extends ConsumerWidget {
                     }
                   }
                 },
+                onRate: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => RateDoctorSheet(
+                      doctorName: appt.doctorName ?? "Doctor",
+                      doctorImage: appt.doctorImage,
+                      onSubmit: (stars, comment) async {
+                        final repo = ref.read(patientRepositoryProvider);
+                        final success = await repo.rateDoctor(
+                          doctorId: appt.doctorId,
+                          stars: stars,
+                          comment: comment,
+                        );
+                        if (context.mounted && success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Thanks for your rating!')),
+                          );
+                        }
+                        return success;
+                      },
+                    ),
+                  );
+                },
               );
             },
           );
@@ -106,13 +133,16 @@ class _AppointmentCard extends StatelessWidget {
   /**
    * appointment The typed Appointment model.
    * onCancel The callback triggered when the cancel button is pressed.
+   * onRate The callback triggered when the rate button is pressed.
    */
   final Appointment appointment;
   final VoidCallback onCancel;
+  final VoidCallback onRate;
 
   const _AppointmentCard({
     required this.appointment,
     required this.onCancel,
+    required this.onRate,
   });
 
   @override
@@ -222,8 +252,28 @@ class _AppointmentCard extends StatelessWidget {
                 child: const Text("Cancel Appointment"),
               ),
             ),
+          
+          if (statusInt == 1) // Show rate button for completed appointments
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onRate,
+                icon: const Icon(Icons.star_rounded, color: Colors.white),
+                label: const Text("Rate Doctor"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF135BEC),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  elevation: 0,
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 }
+
+

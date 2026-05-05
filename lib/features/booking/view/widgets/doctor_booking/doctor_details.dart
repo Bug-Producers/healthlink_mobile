@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/widgets/header_text.dart';
-import '../../screens/doctor_booking_screen.dart';
+import '../../../../../core/models/doctor.dart';
 
 import '../../../../../core/utils/image_helper.dart';
 
@@ -13,10 +13,10 @@ import '../../../../../core/utils/image_helper.dart';
 class DoctorDetails extends StatelessWidget {
   const DoctorDetails({
     super.key,
-    required this.widget,
+    required this.doctor,
   });
 
-  final DoctorBookingScreen widget;
+  final Doctor doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class DoctorDetails extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             image: DecorationImage(
-              image: ImageHelper.getImageProvider(widget.doctor.profileImage),
+              image: ImageHelper.getImageProvider(doctor.profileImage),
               fit: BoxFit.cover,
             ),
           ),
@@ -36,7 +36,7 @@ class DoctorDetails extends StatelessWidget {
         SizedBox(height: 18.h),
 
         HeaderText(
-          text: 'Dr. ${widget.doctor.name}',
+          text: 'Dr. ${doctor.name}',
           fontsize: 24.sp,
         ),
         SizedBox(height: 4.h),
@@ -44,7 +44,7 @@ class DoctorDetails extends StatelessWidget {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
           child: AutoSizeText(
-            '${widget.doctor.department} • ${widget.doctor.clinicName}',
+            '${doctor.department} • ${doctor.clinicName}',
             maxLines: 1,
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
@@ -66,7 +66,7 @@ class DoctorDetails extends StatelessWidget {
             ),
             Flexible(
               child: AutoSizeText(
-                " ${widget.doctor.city}, ${widget.doctor.country}",
+                " ${doctor.city}, ${doctor.country}",
                 maxLines: 1,
                 style: GoogleFonts.inter(
                   fontSize: 14.sp,

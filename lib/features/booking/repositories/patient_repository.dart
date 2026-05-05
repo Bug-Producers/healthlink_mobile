@@ -64,6 +64,9 @@ class PatientRepository {
       final response = await _apiClient.dio.get('/patients/doctors');
       final list = response.data['doctors'] as List<dynamic>? ?? [];
       return list.map((e) => Doctor.fromJson(e as Map<String, dynamic>)).toList();
+    } on DioException catch (e) {
+      debugPrint('[PatientRepo] getAllDoctors DioException: ${e.response?.statusCode} - ${e.response?.data}');
+      throw Exception('Failed to fetch doctors: $e');
     } catch (e) {
       throw Exception('Failed to fetch doctors: $e');
     }

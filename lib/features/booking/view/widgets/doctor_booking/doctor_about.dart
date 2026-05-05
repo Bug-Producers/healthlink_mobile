@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/widgets/header_text.dart';
-import '../../screens/doctor_booking_screen.dart';
+import '../../../../../core/models/doctor.dart';
+
 class DoctorAbout extends StatelessWidget {
   const DoctorAbout({
     super.key,
-    required this.widget,
+    required this.doctor,
   });
 
-  final DoctorBookingScreen widget;
+  final Doctor doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class DoctorAbout extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            widget.doctor.about,
+            doctor.about,
             style: GoogleFonts.inter(
               color: const Color(0XFF475569),
               fontSize: 16.sp,
