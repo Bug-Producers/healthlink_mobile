@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "780566146913-1p7n6ae5gl0r6s32r8i2ckjk9sgb64lm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.healthlink_mobile",
+            "certificate_hash": "ca8b62fe8d5f153bd7ff6edb564d835421c0c86f"
+          }
+        },
+        {
           "client_id": "780566146913-n9gpodn37gfq4t9l5o7aem73a2nb3be5.apps.googleusercontent.com",
           "client_type": 3
         }
